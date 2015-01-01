@@ -98,7 +98,10 @@ public class ProfileListActivity extends ActionBarActivity
         int id = item.getItemId();
         switch(id) {
             case R.id.menu_profile_list_profile_register:
-                showDialog("menu_profile_list_profile_register");
+                //showDialog("menu_profile_list_profile_register");
+                Intent intent = new Intent(this, ProfileRegisterActivity.class);
+                startActivity(intent);
+
                 break;
             case R.id.menu_profile_list_appointment_list:
                 showDialog("menu_profile_list_appointment_list");

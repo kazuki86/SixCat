@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v4.app.NavUtils;
+import android.view.Menu;
 import android.view.MenuItem;
 
 
@@ -49,9 +50,18 @@ public class ProfileDetailActivity extends ActionBarActivity {
         }
     }
 
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_profile_detail, menu);
+        return true;
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
+
         if (id == android.R.id.home) {
             // This ID represents the Home or Up button. In the case of this
             // activity, the Up button is shown. Use NavUtils to allow users
@@ -62,6 +72,21 @@ public class ProfileDetailActivity extends ActionBarActivity {
             //
             NavUtils.navigateUpTo(this, new Intent(this, ProfileListActivity.class));
             return true;
+        }
+
+        switch(id) {
+            case R.id.menu_profile_detail_profile_edit:
+                //showDialog("menu_profile_list_profile_register");
+                Intent intent = new Intent(this, ProfileEditActivity.class);
+                startActivity(intent);
+
+                break;
+            case R.id.menu_profile_detail_appointment_list:
+                //showDialog("menu_profile_list_appointment_list");
+                return true;
+            case R.id.menu_profile_detail_appointment_register:
+                //showDialog("menu_profile_list_appointment_register");
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }

@@ -12,6 +12,7 @@
             android:label="@string/title_profile_list" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -22,6 +23,14 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="jp.gr.java_conf.kazuki.sixcat.ProfileListActivity" />
+        </activity>
+        <activity
+            android:name="jp.gr.java_conf.kazuki.sixcat.ProfileRegisterActivity"
+            android:label="@string/title_activity_profile_register" >
+        </activity>
+        <activity
+            android:name="jp.gr.java_conf.kazuki.sixcat.ProfileEditActivity"
+            android:label="@string/title_activity_profile_edit" >
         </activity>
     </application>
 

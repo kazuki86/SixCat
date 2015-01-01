@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/menu_profile_detail_profile_edit"
+        android:title="prof+"
+        app:showAsAction="always" />
+    <item android:id="@+id/menu_profile_detail_appointment_list"
+        android:title="appo list"
+        app:showAsAction="always" />
+    <item android:id="@+id/menu_profile_detail_appointment_register"
+        android:title="appo+"
+        app:showAsAction="ifRoom" />
+
+</menu>
