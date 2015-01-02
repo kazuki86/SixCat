@@ -1,13 +1,19 @@
 package jp.gr.java_conf.kazuki.sixcat;
 
 import android.app.Activity;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
 
 
+import jp.gr.java_conf.kazuki.sixcat.data.SixCatSQLiteOpenHelper;
 import jp.gr.java_conf.kazuki.sixcat.dummy.DummyContent;
 
 /**
@@ -37,6 +43,9 @@ public class ProfileListFragment extends ListFragment {
      * The current activated item position. Only used on tablets.
      */
     private int mActivatedPosition = ListView.INVALID_POSITION;
+
+
+    private SQLiteDatabase db;
 
     /**
      * A callback interface that all activities containing this fragment must
@@ -71,12 +80,28 @@ public class ProfileListFragment extends ListFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // TODO: replace with a real list adapter.
-        setListAdapter(new ArrayAdapter<DummyContent.DummyItem>(
-                getActivity(),
+        SixCatSQLiteOpenHelper helper = new SixCatSQLiteOpenHelper(getActivity());
+        db = helper.getReadableDatabase();
+        Cursor cursor = db.query("view_profile_list",
+                new String[]{"_id","status","name","birthday"},
+                null,null,null,null,"_id desc");
+
+        ListAdapter adapter = new SimpleCursorAdapter(getActivity(),
                 R.layout.partial_profile_list_element,
-                R.id.txt_profile_list_element_name,
-                DummyContent.ITEMS));
+                cursor,
+                new String[] { "name", "birthday" },
+                new int[] { R.id.txt_profile_list_element_name, R.id.txt_profile_list_element_address }
+                );
+        setListAdapter(adapter);
+        Log.d("Activity", "ProfileListFragment#onCreate called.");
+
+//
+//        // TODO: replace with a real list adapter.
+//        setListAdapter(new ArrayAdapter<DummyContent.DummyItem>(
+//                getActivity(),
+//                R.layout.partial_profile_list_element,
+//                R.id.txt_profile_list_element_name,
+//                DummyContent.ITEMS));
     }
 
     @Override
@@ -114,9 +139,12 @@ public class ProfileListFragment extends ListFragment {
     public void onListItemClick(ListView listView, View view, int position, long id) {
         super.onListItemClick(listView, view, position, id);
 
+        Log.d("View","id:"+id);
+
         // Notify the active callbacks interface (the activity, if the
         // fragment is attached to one) that an item has been selected.
-        mCallbacks.onItemSelected(DummyContent.ITEMS.get(position).id);
+        //mCallbacks.onItemSelected(DummyContent.ITEMS.get(position).id);
+        mCallbacks.onItemSelected(Long.toString(id));
     }
 
     @Override
