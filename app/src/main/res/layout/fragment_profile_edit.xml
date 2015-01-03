@@ -26,6 +26,13 @@
                     android:layout_height="80dp"
                     android:id="@+id/img_profile_edit_portrait"
                     android:src="@drawable/ic_launcher" />
+
+                <EditText
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/txt_profile_edit_portrait"
+                    android:layout_weight="1"
+                    android:visibility="gone" />
             </LinearLayout>
 
             <LinearLayout
@@ -67,7 +74,7 @@
                 <EditText
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/editText2"
+                    android:id="@+id/et_profile_edit_kana"
                     android:layout_weight="1" />
             </LinearLayout>
 
@@ -88,7 +95,7 @@
                 <EditText
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/editText3"
+                    android:id="@+id/et_profile_edit_nickname"
                     android:layout_weight="1" />
             </LinearLayout>
 
@@ -133,7 +140,7 @@
                     android:layout_height="wrap_content"
                     android:inputType="date"
                     android:ems="10"
-                    android:id="@+id/editText5"
+                    android:id="@+id/et_profile_edit_birthday"
                     android:layout_weight="1" />
             </LinearLayout>
 

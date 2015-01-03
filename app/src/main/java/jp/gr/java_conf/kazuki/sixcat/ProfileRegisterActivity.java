@@ -2,14 +2,17 @@ package jp.gr.java_conf.kazuki.sixcat;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,9 +24,15 @@ import android.widget.ImageView;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+
+import jp.gr.java_conf.kazuki.sixcat.data.SixCatSQLiteOpenHelper;
 
 
 public class ProfileRegisterActivity extends ActionBarActivity {
+
+    private SQLiteDatabase db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +42,10 @@ public class ProfileRegisterActivity extends ActionBarActivity {
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.container, new PlaceholderFragment())
                     .commit();
+        }
+        if (db == null) {
+            SixCatSQLiteOpenHelper helper = new SixCatSQLiteOpenHelper(this);
+            db = helper.getWritableDatabase();
         }
     }
 
@@ -57,7 +70,14 @@ public class ProfileRegisterActivity extends ActionBarActivity {
             PlaceholderFragment fragment = (PlaceholderFragment)getSupportFragmentManager().findFragmentById(R.id.container);
             EditText edit_name= (EditText)fragment.getView().findViewById(R.id.et_profile_edit_name);
             showDialog("save result", "name:" + edit_name.getText().toString());
-
+            long profile_id = save();
+            if ( profile_id != -1 ) {
+                Intent detailIntent = new Intent(this, ProfileDetailActivity.class);
+                detailIntent.putExtra(ProfileDetailFragment.ARG_ITEM_ID, Long.toString(profile_id));
+                startActivity(detailIntent);
+            } else {
+                showDialog("Error", "保存に失敗しました。");
+            }
             return true;
         }else if (id == R.id.action_profile_register_cancel) {
             //戻る
@@ -68,6 +88,44 @@ public class ProfileRegisterActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    private long save(){
+        long id = -1;
+        try {
+            db.beginTransaction();
+            ContentValues profileHd = new ContentValues();
+            profileHd.put("status", 0);
+            id = db.insert("profile_hd", null, profileHd);
+
+            //TODO ここらへんは、動的ビューにしたら変更する。
+            List<ProfileDetail> values = new ArrayList<ProfileDetail>();
+            values.add(new ProfileDetail(1,1,((EditText)getView(R.id.et_profile_edit_name)).getText().toString()));
+            values.add(new ProfileDetail(2,1,((EditText)getView(R.id.et_profile_edit_kana)).getText().toString()));
+            values.add(new ProfileDetail(3,1,((EditText)getView(R.id.et_profile_edit_nickname)).getText().toString()));
+            values.add(new ProfileDetail(4,1,((EditText)getView(R.id.et_profile_edit_birthday)).getText().toString()));
+
+            for(ProfileDetail value : values) {
+                ContentValues profileDetail = new ContentValues();
+                profileDetail.put("profile_id", id);
+                profileDetail.put("key_id", value.key_id);
+                profileDetail.put("sequence", value.sequence);
+                profileDetail.put("value", value.value);
+                db.insert("profile_detail",null, profileDetail);
+            }
+
+            db.setTransactionSuccessful();
+            db.endTransaction();
+
+        } catch(Exception e) {
+            Log.e("ERROR", e.toString());
+            return -1;
+        }
+        return id;
+    }
+
+    private View getView(int id) {
+        PlaceholderFragment fragment = (PlaceholderFragment)getSupportFragmentManager().findFragmentById(R.id.container);
+        return fragment.getView().findViewById(id);
+    }
     private void showDialog(String title, String text){
 
         AlertDialog.Builder dialog = new AlertDialog.Builder(this);
@@ -85,54 +143,21 @@ public class ProfileRegisterActivity extends ActionBarActivity {
     /**
      * A placeholder fragment containing a simple view.
      */
-    public static class PlaceholderFragment extends Fragment {
+    public static class PlaceholderFragment extends AbstractProfileEditFragment {
 
-        final int REQUEST_ACTION_PICK = 1;
         public PlaceholderFragment() {
+            super();
         }
+    }
 
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_profile_edit, container, false);
-
-
-            //img_profile_edit_portrait
-            final ImageView portrait = (ImageView)rootView.findViewById(R.id.img_profile_edit_portrait);
-            if (portrait != null) {
-                portrait.setOnClickListener(new View.OnClickListener() {
-
-                    @Override
-                    public void onClick(View v) {
-                        //実行フロー
-//                        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                        //これだとギャラリー専門が開きます。
-                        Intent intent = new Intent(Intent.ACTION_PICK);
-                        intent.setType("image/*");
-                        //createChooserを使うと選択ダイアログのタイトルを変更する事ができます。
-                        startActivityForResult(Intent.createChooser(intent, "select"), REQUEST_ACTION_PICK);
-                        //デフォルトで「アプリ選択」と出ます。
-                        //startActivityForResult(intent, REQUEST_ACTION_PICK);
-                    }
-                });
-            }
-
-            return rootView;
-        }
-
-        public void onActivityResult(int requestCode, int resultCode, Intent data) {
-            if(resultCode == RESULT_OK){
-                if(requestCode == REQUEST_ACTION_PICK){
-                    try {
-                        InputStream iStream = getActivity().getApplicationContext().getContentResolver().openInputStream(data.getData());
-                        Bitmap bm = BitmapFactory.decodeStream(iStream);
-                        iStream.close();
-                        //Bitmapで普通に利用ができます。
-                        ((ImageView) getActivity().findViewById(R.id.img_profile_edit_portrait)).setImageBitmap(bm);
-                    }catch (IOException e) {}
-                }
-            }
-            super.onActivityResult(requestCode, resultCode, data);
+    class ProfileDetail{
+        public long key_id;
+        public int sequence;
+        public String value;
+        public ProfileDetail(long key_id, int sequence, String value){
+            this.key_id = key_id;
+            this.sequence = sequence;
+            this.value = value;
         }
     }
 }
