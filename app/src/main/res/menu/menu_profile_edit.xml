@@ -4,6 +4,8 @@
     tools:context="jp.gr.java_conf.kazuki.sixcat.ProfileEditActivity">
     <item android:id="@+id/action_profile_edit_save" android:title="save"
         android:orderInCategory="100" app:showAsAction="always" />
+    <item android:id="@+id/action_profile_edit_delete" android:title="del"
+        android:orderInCategory="100" app:showAsAction="always" />
     <item android:id="@+id/action_profile_edit_cancel" android:title="cancel"
         android:orderInCategory="100" app:showAsAction="always" />
 </menu>

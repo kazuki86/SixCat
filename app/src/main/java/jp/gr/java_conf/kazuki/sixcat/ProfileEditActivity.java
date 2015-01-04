@@ -72,11 +72,12 @@ public class ProfileEditActivity extends ActionBarActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
+        PlaceholderFragment fragment = (PlaceholderFragment)getSupportFragmentManager().findFragmentById(R.id.container);
+        EditText edit_name= (EditText)fragment.getView().findViewById(R.id.et_profile_edit_name);
+
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_profile_edit_save) {
 
-            PlaceholderFragment fragment = (PlaceholderFragment)getSupportFragmentManager().findFragmentById(R.id.container);
-            EditText edit_name= (EditText)fragment.getView().findViewById(R.id.et_profile_edit_name);
             showDialog("update result", "name:" + edit_name.getText().toString());
             boolean result = save();
             if (result ) {
@@ -87,6 +88,33 @@ public class ProfileEditActivity extends ActionBarActivity {
                 showDialog("Error", "保存に失敗しました。");
             }
             return true;
+        }else if (id == R.id.action_profile_edit_delete) {
+
+            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+            dialog.setTitle("Confirm");
+            dialog.setMessage(edit_name.getText().toString() + "さんのデータを本当に削除しますか？");
+            dialog.setPositiveButton("YES",new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+//                    ProfileEditActivity.this.setResult(Activity.RESULT_OK);
+                    boolean result = delete();
+                    if (result ) {
+                        Intent listIntent = new Intent(ProfileEditActivity.this, ProfileListActivity.class);
+                        startActivity(listIntent);
+                    } else {
+                        showDialog("Error", "削除に失敗しました。");
+                    }
+                }
+            });
+            dialog.setNegativeButton("Cancel",new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+//                    ProfileEditActivity.this.setResult(Activity.RESULT_OK);
+                }
+            });
+            dialog.create();
+            dialog.show();
+            return true;
         }else if (id == R.id.action_profile_edit_cancel) {
             //戻る
             finish();
@@ -96,6 +124,24 @@ public class ProfileEditActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
+
+    private boolean delete(){
+        try {
+            db.beginTransaction();
+
+            db.delete("profile_hd","_id = ?",new String[]{Long.toString(profile_id)});
+            db.delete("profile_detail","profile_id = ?",new String[]{Long.toString(profile_id)});
+
+            db.setTransactionSuccessful();
+            db.endTransaction();
+        } catch(Exception e) {
+            Log.e("ERROR", e.toString());
+            return false;
+        }
+        return true;
+
+
+    }
     private boolean save(){
         try {
             db.beginTransaction();
