@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v4.app.NavUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -39,11 +40,14 @@ public class ProfileDetailActivity extends ActionBarActivity {
         if (savedInstanceState == null) {
             // Create the detail fragment and add it to the activity
             // using a fragment transaction.
+            Log.d("Debug", "aaa");
             Bundle arguments = new Bundle();
             arguments.putString(ProfileDetailFragment.ARG_ITEM_ID,
                     getIntent().getStringExtra(ProfileDetailFragment.ARG_ITEM_ID));
             ProfileDetailFragment fragment = new ProfileDetailFragment();
             fragment.setArguments(arguments);
+
+            Log.d("Debug", "bbb");
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.profile_detail_container, fragment)
                     .commit();
@@ -78,6 +82,9 @@ public class ProfileDetailActivity extends ActionBarActivity {
             case R.id.menu_profile_detail_profile_edit:
                 //showDialog("menu_profile_list_profile_register");
                 Intent intent = new Intent(this, ProfileEditActivity.class);
+                String profile_id = getIntent().getStringExtra(ProfileDetailFragment.ARG_ITEM_ID);
+                Log.d("Debug", profile_id);
+                intent.putExtra(AbstractProfileEditFragment.ARG_ITEM_ID, profile_id);
                 startActivity(intent);
 
                 break;

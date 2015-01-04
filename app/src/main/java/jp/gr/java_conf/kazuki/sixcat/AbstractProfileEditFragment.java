@@ -29,6 +29,8 @@ import java.io.InputStream;
  */
 public abstract class AbstractProfileEditFragment extends Fragment {
 
+    public static final String ARG_ITEM_ID = "item_id";
+
     final int REQUEST_ACTION_PICK = 1;
 
     public static final int TAG_IMG_FILE_NAME = 1;
@@ -66,9 +68,12 @@ public abstract class AbstractProfileEditFragment extends Fragment {
                 }
             });
         }
+        initializeView(rootView);
 
         return rootView;
     }
+
+    abstract protected void initializeView(View rootView);
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.d("debug_kazuki", "onActivityResult called");

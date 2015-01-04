@@ -40,7 +40,9 @@ public class ProfileDetailFragment extends Fragment {
     private final int IDX_ID = 0;
     private final int IDX_STATUS = 1;
     private final int IDX_NAME = 2;
-    private final int IDX_BIRTHDAY = 3;
+    private final int IDX_KANA = 3;
+    private final int IDX_NICKNAME = 4;
+    private final int IDX_BIRTHDAY = 5;
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
@@ -61,11 +63,12 @@ public class ProfileDetailFragment extends Fragment {
             db = helper.getReadableDatabase();
             //sample
             cursor = db.query("view_profile_list",
-                    new String[]{"_id","status","name","birthday"},
+                    new String[]{"_id","status","name","kana","nickname","birthday"},
                     "_id = ?",new String[]{getArguments().getString(ARG_ITEM_ID)}
                     ,null,null,null);
             cursor.moveToFirst();
 
+            Log.d("Debug", "ccc");
             // Load the dummy content specified by the fragment
             // arguments. In a real-world scenario, use a Loader
             // to load content from a content provider.

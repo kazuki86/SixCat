@@ -148,6 +148,10 @@ public class ProfileRegisterActivity extends ActionBarActivity {
         public PlaceholderFragment() {
             super();
         }
+
+        protected void initializeView(View rootView){
+
+        }
     }
 
     class ProfileDetail{
