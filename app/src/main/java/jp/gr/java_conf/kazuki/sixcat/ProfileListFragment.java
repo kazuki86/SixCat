@@ -7,15 +7,11 @@ import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
-
 import jp.gr.java_conf.kazuki.sixcat.data.SixCatSQLiteOpenHelper;
-import jp.gr.java_conf.kazuki.sixcat.dummy.DummyContent;
-
 /**
  * A list fragment representing a list of ProfileList. This fragment
  * also supports tablet devices by allowing list items to be given an
@@ -94,14 +90,6 @@ public class ProfileListFragment extends ListFragment {
                 );
         setListAdapter(adapter);
         Log.d("Activity", "ProfileListFragment#onCreate called.");
-
-//
-//        // TODO: replace with a real list adapter.
-//        setListAdapter(new ArrayAdapter<DummyContent.DummyItem>(
-//                getActivity(),
-//                R.layout.partial_profile_list_element,
-//                R.id.txt_profile_list_element_name,
-//                DummyContent.ITEMS));
     }
 
     @Override

@@ -8,13 +8,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-
 import jp.gr.java_conf.kazuki.sixcat.data.SixCatSQLiteOpenHelper;
-import jp.gr.java_conf.kazuki.sixcat.dummy.DummyContent;
 
 /**
  * A fragment representing a single Profile detail screen.
@@ -28,12 +25,6 @@ public class ProfileDetailFragment extends Fragment {
      * represents.
      */
     public static final String ARG_ITEM_ID = "item_id";
-
-    /**
-     * The dummy content this fragment is presenting.
-     */
-    private DummyContent.DummyItem mItem;
-
 
     private SQLiteDatabase db;
 
@@ -87,7 +78,6 @@ public class ProfileDetailFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_profile_detail, container, false);
 
-        // Show the dummy content as text in a TextView.
         if (cursor != null) {
 
             LinearLayout containerView = (LinearLayout)rootView.findViewById(R.id.container_profile_detail);
@@ -114,29 +104,6 @@ public class ProfileDetailFragment extends Fragment {
 
                 containerView.addView(row);
             }
-
-
-//            while(cursor.moveToNext()) {
-//                //TODO ここで、各値に応じたViewを動的にセットする
-//                int key_id = Integer.valueOf(cursor.getString(cursor.getColumnIndex("key_id")));
-//                String value = cursor.getString(cursor.getColumnIndex("value"));
-//                switch(key_id) {
-//                    case 1://name
-//                        ((TextView) rootView.findViewById(R.id.txt_profile_detail_name)).setText(value);
-//                        break;
-//                    case 2://kana
-//                        ((TextView) rootView.findViewById(R.id.txt_profile_detail_memo)).setText(value);
-//                        break;
-//                    case 3://nickname
-//                        ((TextView) rootView.findViewById(R.id.txt_profile_detail_age)).setText(value);
-//                        break;
-//                    case 4://birthday
-//                        ((TextView) rootView.findViewById(R.id.txt_profile_detail_address)).setText(value);
-//                        break;
-//                }
-//            }
-//            ((TextView) rootView.findViewById(R.id.txt_profile_detail_name)).setText(cursor.getString(cursor.getColumnIndex("name")));
-//            ((TextView) rootView.findViewById(R.id.txt_profile_detail_address)).setText(cursor.getString(cursor.getColumnIndex("birthday")));
 
         }
 

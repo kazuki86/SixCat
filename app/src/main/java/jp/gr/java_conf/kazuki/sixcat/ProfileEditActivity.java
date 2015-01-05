@@ -10,15 +10,13 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -27,7 +25,6 @@ import android.widget.TextView;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -152,16 +149,13 @@ public class ProfileEditActivity extends ActionBarActivity {
         }
         return true;
 
-
     }
+
     private boolean save(){
         try {
             db.beginTransaction();
 
-            //TODO ここらへんは、動的ビューにしたら変更する。
             List<ProfileDetail> values = new ArrayList<ProfileDetail>();
-
-
             LinearLayout containerView = (LinearLayout)getView(R.id.container_profile_edit);
             for(int i=0; i<containerView.getChildCount(); i++) {
                 View child = containerView.getChildAt(i);
@@ -169,32 +163,10 @@ public class ProfileEditActivity extends ActionBarActivity {
                 Integer sequence = (Integer)child.getTag(R.string.tag_key_sequence);
                 Integer value_type = (Integer)child.getTag(R.string.tag_key_type);
                 if (key_id == null || sequence == null) continue;
-                String value = null;
-                switch(value_type){
-                    case 1:
-                    case 2:
-                    case 3:
-                    case 4:
-                    case 6:
-                        EditText editText = (EditText) child.findViewById(R.id.txt_profile_edit_element);
-                        value = editText.getText().toString();
-                        break;
-                    case 5:
-                        continue;
-                        //break;
-                    case 7:
-                        ImageView imageView = (ImageView) child.findViewById(R.id.img_profile_edit_element);
-                        value = (String)imageView.getTag(R.string.tag_image_file_path);
-                        break;
-                }
+                String value = getInputValue(child, value_type);
+                if (value == null) continue;
                 values.add(new ProfileDetail(Long.valueOf(key_id), sequence, value));
             }
-
-//            values.add(new ProfileDetail(1,1,((EditText)getView(R.id.et_profile_edit_name)).getText().toString()));
-//            values.add(new ProfileDetail(2,1,((EditText)getView(R.id.et_profile_edit_kana)).getText().toString()));
-//            values.add(new ProfileDetail(3,1,((EditText)getView(R.id.et_profile_edit_nickname)).getText().toString()));
-//            values.add(new ProfileDetail(4,1,((EditText)getView(R.id.et_profile_edit_birthday)).getText().toString()));
-
 
             db.delete("profile_detail","profile_id = ?",new String[]{Long.toString(profile_id)});
             for(ProfileDetail value : values) {
@@ -214,6 +186,28 @@ public class ProfileEditActivity extends ActionBarActivity {
             return false;
         }
         return true;
+    }
+
+    private String getInputValue(View child, Integer value_type) {
+        String value = null;
+        switch(value_type){
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+            case 6:
+                EditText editText = (EditText) child.findViewById(R.id.txt_profile_edit_element);
+                value = editText.getText().toString();
+                break;
+            case 5:
+                value = null;
+                break;
+            case 7:
+                ImageView imageView = (ImageView) child.findViewById(R.id.img_profile_edit_element);
+                value = (String)imageView.getTag(R.string.tag_image_file_path);
+                break;
+        }
+        return value;
     }
 
     private View getView(int id) {
@@ -239,14 +233,6 @@ public class ProfileEditActivity extends ActionBarActivity {
      * A placeholder fragment containing a simple view.
      */
     public static class PlaceholderFragment extends AbstractProfileEditFragment {
-
-
-//        private final int IDX_ID = 0;
-//        private final int IDX_STATUS = 1;
-//        private final int IDX_NAME = 2;
-//        private final int IDX_KANA = 3;
-//        private final int IDX_NICKNAME = 4;
-//        private final int IDX_BIRTHDAY = 5;
 
         public PlaceholderFragment() {
             super();
@@ -305,19 +291,21 @@ public class ProfileEditActivity extends ActionBarActivity {
 
                                 // 日付情報の初期設定
                                 Calendar calendar = Calendar.getInstance();
-                                java.util.Date date = null;
                                 try {
                                     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
                                     dateFormat.setLenient(false);
-                                    date = dateFormat.parse(editText.getText().toString());
+                                    java.util.Date date = dateFormat.parse(editText.getText().toString());
                                     calendar.setTime(date);
-                                }catch( ParseException e ) {
-                                }
-                                int year = calendar.get(Calendar.YEAR); // 年
-                                int monthOfYear = calendar.get(Calendar.MONTH); // 月
-                                int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH); // 日
+                                }catch( ParseException e ) {}
 
-                                DatePickerDialog dialog = new DatePickerDialog(getActivity(),android.R.style.Theme_Light, DateSetListener,year,monthOfYear,dayOfMonth);
+                                DatePickerDialog dialog = new DatePickerDialog(
+                                        getActivity(),
+                                        android.R.style.Theme_Light,
+                                        DateSetListener,
+                                        calendar.get(Calendar.YEAR),
+                                        calendar.get(Calendar.MONTH),
+                                        calendar.get(Calendar.DAY_OF_MONTH)
+                                );
                                 dialog.show();
                             }
                         });
@@ -330,7 +318,6 @@ public class ProfileEditActivity extends ActionBarActivity {
 
                         if (value != null) {
                             imageView.setTag(R.string.tag_image_file_path,value);
-                            //TODO ファイル名から画像をロードしてセットする。
                             try {
                                 File srcFile = new File(value);
                                 FileInputStream fis = new FileInputStream(srcFile);
@@ -358,25 +345,13 @@ public class ProfileEditActivity extends ActionBarActivity {
 
                 containerView.addView(row);
             }
-//
-//
-//            //sample
-//            //TODO ここは本来は、view_profile_listから取得せずに直接profile_detailから取得するように変更する。
-//            cursor = db.query("view_profile_list",
-//                    new String[]{"_id","status","name","kana","nickname","birthday"},
-//                    "_id = ?",new String[]{profile_id}
-//                    ,null,null,null);
-//            cursor.moveToFirst();
-//
-//            ((EditText) rootView.findViewById(R.id.et_profile_edit_name)).setText(cursor.getString(cursor.getColumnIndex("name")));
-//            ((EditText) rootView.findViewById(R.id.et_profile_edit_kana)).setText(cursor.getString(cursor.getColumnIndex("kana")));
-//            ((EditText) rootView.findViewById(R.id.et_profile_edit_nickname)).setText(cursor.getString(cursor.getColumnIndex("nickname")));
-//            ((EditText) rootView.findViewById(R.id.et_profile_edit_birthday)).setText(cursor.getString(cursor.getColumnIndex("birthday")));
+
         }
 
         private Cursor getProfileKeyMasterWithExistValueCursor(String profile_id) {
             return db.query("view_profile_detail",
                     null,
+                    //本来profile_idはview定義中のleft join のon句に指定するべきだが仕方なく。
                     "(profile_id = ? or profile_id is NULL) and use_flg = ?",
                     new String[]{profile_id, "1"},
                     null,
