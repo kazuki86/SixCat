@@ -44,7 +44,7 @@ public abstract class AbstractProfileEditFragment extends Fragment {
 
     private String imageFileName;
 
-    private SQLiteDatabase db;
+    protected SQLiteDatabase db;
 
     public AbstractProfileEditFragment() {
     }
@@ -52,24 +52,17 @@ public abstract class AbstractProfileEditFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        if (db == null) {
+            SixCatSQLiteOpenHelper helper = new SixCatSQLiteOpenHelper(getActivity());
+            db = helper.getReadableDatabase();
+        }
+
         View rootView = inflater.inflate(R.layout.fragment_profile_edit, container, false);
 
-        LinearLayout containerView = (LinearLayout)rootView.findViewById(R.id.container_profile_edit);
-        Cursor cursor = getProfileKeyMasterCursor();
 
-        while(cursor.moveToNext()){
 
-            View row = inflater.inflate(R.layout.partial_profile_edit_element_text, null);
-
-            TextView label = (TextView) row.findViewById(R.id.lbl_profile_edit_element);
-            label.setText(cursor.getString(cursor.getColumnIndex("name")));
-
-            EditText editText = (EditText) row.findViewById(R.id.txt_profile_edit_element);
-            editText.setTag(R.string.tag_key_id, cursor.getString(cursor.getColumnIndex("_id")));
-            editText.setTag(R.string.tag_key_sequence, 1);
-
-            containerView.addView(row);
-        }
+        initializeView(inflater, rootView);
 
         //img_profile_edit_portrait
         final ImageView portrait = (ImageView)rootView.findViewById(R.id.img_profile_edit_portrait);
@@ -90,27 +83,11 @@ public abstract class AbstractProfileEditFragment extends Fragment {
                 }
             });
         }
-        initializeView(rootView);
 
         return rootView;
     }
 
-    private Cursor getProfileKeyMasterCursor() {
-        if (db == null) {
-            SixCatSQLiteOpenHelper helper = new SixCatSQLiteOpenHelper(getActivity());
-            db = helper.getReadableDatabase();
-        }
-
-        return db.query("profile_key_master",
-                null,
-                "use_flg = ?",
-                new String[]{"1"},
-                null,
-                null,
-                "sort_order"
-        );
-    }
-    abstract protected void initializeView(View rootView);
+    abstract protected void initializeView(LayoutInflater inflater, View rootView);
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.d("debug_kazuki", "onActivityResult called");

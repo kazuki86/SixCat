@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -198,9 +199,6 @@ public class ProfileEditActivity extends ActionBarActivity {
      */
     public static class PlaceholderFragment extends AbstractProfileEditFragment {
 
-        private SQLiteDatabase db;
-        private Cursor cursor;
-
 
 //        private final int IDX_ID = 0;
 //        private final int IDX_STATUS = 1;
@@ -213,24 +211,61 @@ public class ProfileEditActivity extends ActionBarActivity {
             super();
         }
 
-        protected void initializeView(View rootView){
+        protected void initializeView(LayoutInflater inflater, View rootView){
             String profile_id =  getActivity().getIntent().getStringExtra(ARG_ITEM_ID);
 
-            SixCatSQLiteOpenHelper helper = new SixCatSQLiteOpenHelper(getActivity());
+            LinearLayout containerView = (LinearLayout)rootView.findViewById(R.id.container_profile_edit);
+            Cursor cursor = getProfileKeyMasterWithExistValueCursor(profile_id);
 
-            db = helper.getReadableDatabase();
-            //sample
-            //TODO ここは本来は、view_profile_listから取得せずに直接profile_detailから取得するように変更する。
-            cursor = db.query("view_profile_list",
-                    new String[]{"_id","status","name","kana","nickname","birthday"},
-                    "_id = ?",new String[]{profile_id}
-                    ,null,null,null);
-            cursor.moveToFirst();
+            while(cursor.moveToNext()){
 
-            ((EditText) rootView.findViewById(R.id.et_profile_edit_name)).setText(cursor.getString(cursor.getColumnIndex("name")));
-            ((EditText) rootView.findViewById(R.id.et_profile_edit_kana)).setText(cursor.getString(cursor.getColumnIndex("kana")));
-            ((EditText) rootView.findViewById(R.id.et_profile_edit_nickname)).setText(cursor.getString(cursor.getColumnIndex("nickname")));
-            ((EditText) rootView.findViewById(R.id.et_profile_edit_birthday)).setText(cursor.getString(cursor.getColumnIndex("birthday")));
+                View row = inflater.inflate(R.layout.partial_profile_edit_element_text, null);
+                String key_id = cursor.getString(cursor.getColumnIndex("_id"));
+                String value =  cursor.getString(cursor.getColumnIndex("value"));
+                String sequence_str =  cursor.getString(cursor.getColumnIndex("sequence"));
+                int sequence = (sequence_str == null) ? 1 : Integer.valueOf(sequence_str);
+                String label_str = cursor.getString(cursor.getColumnIndex("name")) + ((sequence>1?sequence:""));
+
+                row.setTag(R.string.tag_key_id, key_id);
+                row.setTag(R.string.tag_key_sequence, sequence);
+
+                TextView label = (TextView) row.findViewById(R.id.lbl_profile_edit_element);
+                label.setText(label_str);
+
+                EditText editText = (EditText) row.findViewById(R.id.txt_profile_edit_element);
+                if (value != null) {
+                    editText.setText(value);
+                }
+                editText.setTag(R.string.tag_key_id, key_id);
+                editText.setTag(R.string.tag_key_sequence, sequence);
+
+                containerView.addView(row);
+            }
+//
+//
+//            //sample
+//            //TODO ここは本来は、view_profile_listから取得せずに直接profile_detailから取得するように変更する。
+//            cursor = db.query("view_profile_list",
+//                    new String[]{"_id","status","name","kana","nickname","birthday"},
+//                    "_id = ?",new String[]{profile_id}
+//                    ,null,null,null);
+//            cursor.moveToFirst();
+//
+//            ((EditText) rootView.findViewById(R.id.et_profile_edit_name)).setText(cursor.getString(cursor.getColumnIndex("name")));
+//            ((EditText) rootView.findViewById(R.id.et_profile_edit_kana)).setText(cursor.getString(cursor.getColumnIndex("kana")));
+//            ((EditText) rootView.findViewById(R.id.et_profile_edit_nickname)).setText(cursor.getString(cursor.getColumnIndex("nickname")));
+//            ((EditText) rootView.findViewById(R.id.et_profile_edit_birthday)).setText(cursor.getString(cursor.getColumnIndex("birthday")));
+        }
+
+        private Cursor getProfileKeyMasterWithExistValueCursor(String profile_id) {
+            return db.query("view_profile_detail",
+                    null,
+                    "profile_id = ? and use_flg = ?",
+                    new String[]{profile_id, "1"},
+                    null,
+                    null,
+                    "sort_order"
+            );
         }
     }
 

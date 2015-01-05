@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -21,6 +22,8 @@ import android.view.ViewGroup;
 import android.os.Build;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -96,12 +99,19 @@ public class ProfileRegisterActivity extends ActionBarActivity {
             profileHd.put("status", 0);
             id = db.insert("profile_hd", null, profileHd);
 
-            //TODO ここらへんは、動的ビューにしたら変更する。
             List<ProfileDetail> values = new ArrayList<ProfileDetail>();
-            values.add(new ProfileDetail(1,1,((EditText)getView(R.id.et_profile_edit_name)).getText().toString()));
-            values.add(new ProfileDetail(2,1,((EditText)getView(R.id.et_profile_edit_kana)).getText().toString()));
-            values.add(new ProfileDetail(3,1,((EditText)getView(R.id.et_profile_edit_nickname)).getText().toString()));
-            values.add(new ProfileDetail(4,1,((EditText)getView(R.id.et_profile_edit_birthday)).getText().toString()));
+
+            LinearLayout containerView = (LinearLayout)getView(R.id.container_profile_edit);
+            for(int i=0; i<containerView.getChildCount(); i++) {
+                View child = containerView.getChildAt(i);
+                String key_id = (String)child.getTag(R.string.tag_key_id);
+                Integer sequence = (Integer)child.getTag(R.string.tag_key_sequence);
+                if (key_id == null || sequence == null) continue;
+                //TODO keyごとに探すIDを変える
+                EditText editText = (EditText) child.findViewById(R.id.txt_profile_edit_element);
+                String value = editText.getText().toString();
+                values.add(new ProfileDetail(Long.valueOf(key_id), sequence, value));
+            }
 
             for(ProfileDetail value : values) {
                 ContentValues profileDetail = new ContentValues();
@@ -115,9 +125,9 @@ public class ProfileRegisterActivity extends ActionBarActivity {
             db.setTransactionSuccessful();
             db.endTransaction();
 
-        } catch(Exception e) {
-            Log.e("ERROR", e.toString());
-            return -1;
+        } catch(RuntimeException e) {
+            throw e;
+//            return -1;
         }
         return id;
     }
@@ -149,8 +159,39 @@ public class ProfileRegisterActivity extends ActionBarActivity {
             super();
         }
 
-        protected void initializeView(View rootView){
+        protected void initializeView(LayoutInflater inflater, View rootView){
+            LinearLayout containerView = (LinearLayout)rootView.findViewById(R.id.container_profile_edit);
+            Cursor cursor = getProfileKeyMasterCursor();
 
+            while(cursor.moveToNext()){
+
+                View row = inflater.inflate(R.layout.partial_profile_edit_element_text, null);
+                String key_id = cursor.getString(cursor.getColumnIndex("_id"));
+                int sequence = 1;
+
+                row.setTag(R.string.tag_key_id, key_id);
+                row.setTag(R.string.tag_key_sequence, sequence);
+
+                TextView label = (TextView) row.findViewById(R.id.lbl_profile_edit_element);
+                label.setText(cursor.getString(cursor.getColumnIndex("name")));
+
+                EditText editText = (EditText) row.findViewById(R.id.txt_profile_edit_element);
+                editText.setTag(R.string.tag_key_id, key_id);
+                editText.setTag(R.string.tag_key_sequence, sequence);
+
+                containerView.addView(row);
+            }
+        }
+
+        private Cursor getProfileKeyMasterCursor() {
+            return db.query("profile_key_master",
+                    null,
+                    "use_flg = ?",
+                    new String[]{"1"},
+                    null,
+                    null,
+                    "sort_order"
+            );
         }
     }
 
