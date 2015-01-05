@@ -33,7 +33,7 @@ public class SixCatSQLiteOpenHelper  extends SQLiteOpenHelper {
                 + " description text, "
                 + " sort_order integer not null default 0, "
                 + " plural_flg integer not null default 0, "
-                + " value_type_id integer not null, " // 1:数値、2:単一行テキスト、3:複数行テキスト、3:英数字、4:選択、5:日付、
+                + " value_type_id integer not null, " // 1:数値、2:単一行テキスト、3:複数行テキスト、4:英数字、5:選択、6:日付、
                 + " initial_value text, "
                 + " system_flg integer not null default 0, "
                 + " use_flg integer not null default 1, "

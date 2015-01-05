@@ -2,6 +2,7 @@ package jp.gr.java_conf.kazuki.sixcat;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -20,7 +21,11 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.sql.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import jp.gr.java_conf.kazuki.sixcat.data.SixCatSQLiteOpenHelper;
@@ -219,13 +224,62 @@ public class ProfileEditActivity extends ActionBarActivity {
 
             while(cursor.moveToNext()){
 
-                View row = inflater.inflate(R.layout.partial_profile_edit_element_text, null);
                 String key_id = cursor.getString(cursor.getColumnIndex("_id"));
                 String value =  cursor.getString(cursor.getColumnIndex("value"));
                 String sequence_str =  cursor.getString(cursor.getColumnIndex("sequence"));
+                int value_type =  cursor.getInt(cursor.getColumnIndex("value_type_id"));
                 int sequence = (sequence_str == null) ? 1 : Integer.valueOf(sequence_str);
                 String label_str = cursor.getString(cursor.getColumnIndex("name")) + ((sequence>1?sequence:""));
 
+                View row = null;
+                // 1:数値、2:単一行テキスト、3:複数行テキスト、4:英数字、5:選択、6:日付、
+                switch(value_type) {
+                    case 1:
+                    case 2:
+                    case 3:
+                    case 4:
+                        //
+                        row = inflater.inflate(R.layout.partial_profile_edit_element_text, null);
+                        break;
+                    case 5:
+                        //
+                        break;
+                    case 6:
+                        //
+                        row = inflater.inflate(R.layout.partial_profile_edit_element_date, null);
+                        final EditText editText = (EditText) row.findViewById(R.id.txt_profile_edit_element);
+
+                        editText.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                DatePickerDialog.OnDateSetListener DateSetListener = new DatePickerDialog.OnDateSetListener() {
+                                    public void onDateSet(android.widget.DatePicker datePicker, int year,
+                                                          int monthOfYear, int dayOfMonth) {
+                                        editText.setText("" + year + "/" + (monthOfYear+1) + "/" + dayOfMonth);
+                                    }
+                                };
+
+                                // 日付情報の初期設定
+                                Calendar calendar = Calendar.getInstance();
+                                java.util.Date date = null;
+                                try {
+                                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+                                    dateFormat.setLenient(false);
+                                    date = dateFormat.parse(editText.getText().toString());
+                                    calendar.setTime(date);
+                                }catch( ParseException e ) {
+                                }
+                                int year = calendar.get(Calendar.YEAR); // 年
+                                int monthOfYear = calendar.get(Calendar.MONTH); // 月
+                                int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH); // 日
+
+                                DatePickerDialog dialog = new DatePickerDialog(getActivity(),android.R.style.Theme_Light, DateSetListener,year,monthOfYear,dayOfMonth);
+                                dialog.show();
+                            }
+                        });
+                        break;
+
+                }
                 row.setTag(R.string.tag_key_id, key_id);
                 row.setTag(R.string.tag_key_sequence, sequence);
 
