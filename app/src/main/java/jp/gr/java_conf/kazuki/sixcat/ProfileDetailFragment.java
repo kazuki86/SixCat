@@ -2,14 +2,21 @@ package jp.gr.java_conf.kazuki.sixcat;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 
 import jp.gr.java_conf.kazuki.sixcat.data.SixCatSQLiteOpenHelper;
 
@@ -62,7 +69,7 @@ public class ProfileDetailFragment extends Fragment {
             cursor = db.query("view_profile_detail",
                     null,
                     "profile_id = ?",new String[]{getArguments().getString(ARG_ITEM_ID)}
-                    ,null,null,null);
+                    ,null,null,"sort_order");
             //cursor.moveToFirst();
 
             Log.d("Debug", "ccc");
@@ -89,18 +96,49 @@ public class ProfileDetailFragment extends Fragment {
                 String sequence_str =  cursor.getString(cursor.getColumnIndex("sequence"));
                 int sequence = (sequence_str == null) ? 1 : Integer.valueOf(sequence_str);
                 String label_str = cursor.getString(cursor.getColumnIndex("name")) + ((sequence>1?sequence:""));
+                int value_type =  cursor.getInt(cursor.getColumnIndex("value_type_id"));
 
                 if (value == null) {
                     continue;
                 }
 
-                View row = inflater.inflate(R.layout.partial_profile_detail_element_text, null);
 
+                View row = null;
+                int content_view_id = R.id.txt_profile_edit_element;
+                // 1:数値、2:単一行テキスト、3:複数行テキスト、4:英数字、5:選択、6:日付、7:画像
+                switch(value_type) {
+                    case 1:
+                    case 2:
+                    case 3:
+                    case 4:
+                    case 6:
+                        //
+                        row = inflater.inflate(R.layout.partial_profile_detail_element_text, null);
+                        TextView textView = (TextView) row.findViewById(R.id.txt_profile_detail_element);
+                        textView.setText(value);
+                        break;
+                    case 5:
+                        break;
+                    case 7:
+                        row = inflater.inflate(R.layout.partial_profile_detail_element_image, null);
+                        ImageView imageView = (ImageView) row.findViewById(R.id.img_profile_detail_element);
+
+                        if (value != null) {
+                            imageView.setTag(R.string.tag_image_file_path,value);
+                            try {
+                                File srcFile = new File(value);
+                                FileInputStream fis = new FileInputStream(srcFile);
+                                Bitmap bm = BitmapFactory.decodeStream(fis);
+                                imageView.setImageBitmap(bm);
+                            } catch (FileNotFoundException e) {
+                                Log.d("IMAGE ERROR",e.toString());
+                                e.printStackTrace();
+                            }
+                        }
+                        break;
+                }
                 TextView label = (TextView) row.findViewById(R.id.lbl_profile_detail_element);
                 label.setText(label_str);
-
-                TextView textView = (TextView) row.findViewById(R.id.txt_profile_detail_element);
-                textView.setText(value);
 
                 containerView.addView(row);
             }

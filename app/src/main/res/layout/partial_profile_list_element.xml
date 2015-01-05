@@ -8,38 +8,33 @@
         android:layout_width="60dp"
         android:layout_height="70dp"
         android:id="@+id/img_profile_list_element_portrait"
-        android:src="@drawable/ic_launcher" />
+        android:src="@drawable/no_portrait"
+        android:visibility="gone" />
 
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="fill_parent"
         android:layout_height="70dp">
 
-        <LinearLayout
-            android:orientation="horizontal"
+        <TextView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="六田　花子"
-                android:id="@+id/txt_profile_list_element_name" />
-
-        </LinearLayout>
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="六田　花子"
+            android:id="@+id/txt_profile_list_element_main" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceSmall"
-            android:id="@+id/txt_profile_list_element_address" />
+            android:id="@+id/txt_profile_list_element_sub1" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceSmall"
-            android:id="@+id/txt_profile_list_element_memo" />
+            android:id="@+id/txt_profile_list_element_sub2" />
+
     </LinearLayout>
 
 </LinearLayout>

@@ -2,8 +2,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="jp.gr.java_conf.kazuki.sixcat.ProfileRegisterActivity">
-    <item android:id="@+id/action_profile_register_save" android:title="save"
-        android:orderInCategory="100" app:showAsAction="always" />
-    <item android:id="@+id/action_profile_register_cancel" android:title="cancel"
-        android:orderInCategory="100" app:showAsAction="always" />
+    <item android:id="@+id/action_profile_register_save"
+        android:title="@string/menu_button_save"
+        android:orderInCategory="100"
+        app:showAsAction="always" />
+    <item android:id="@+id/action_profile_register_cancel"
+        android:title="@string/menu_button_cancel"
+        android:orderInCategory="100"
+        app:showAsAction="always" />
 </menu>

@@ -8,11 +8,11 @@
         android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:text="New Text"
-        android:id="@+id/lbl_profile_edit_element" />
+        android:id="@+id/lbl_profile_detail_element" />
 
     <ImageView
         android:layout_width="80dp"
         android:layout_height="80dp"
-        android:id="@+id/img_profile_edit_element"
+        android:id="@+id/img_profile_detail_element"
         android:src="@drawable/no_portrait" />
 </LinearLayout>

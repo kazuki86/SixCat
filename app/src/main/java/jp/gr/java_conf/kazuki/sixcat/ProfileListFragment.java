@@ -78,15 +78,13 @@ public class ProfileListFragment extends ListFragment {
 
         SixCatSQLiteOpenHelper helper = new SixCatSQLiteOpenHelper(getActivity());
         db = helper.getReadableDatabase();
-        Cursor cursor = db.query("view_profile_list",
-                new String[]{"_id","status","name","birthday"},
-                null,null,null,null,"_id desc");
+        Cursor cursor = db.query("view_profile_list",null,null,null,null,null,"_id desc");
 
         ListAdapter adapter = new SimpleCursorAdapter(getActivity(),
                 R.layout.partial_profile_list_element,
                 cursor,
-                new String[] { "name", "birthday" },
-                new int[] { R.id.txt_profile_list_element_name, R.id.txt_profile_list_element_address }
+                new String[] { "name", "kana", "nickname" },
+                new int[] { R.id.txt_profile_list_element_main, R.id.txt_profile_list_element_sub1, R.id.txt_profile_list_element_sub2 }
                 );
         setListAdapter(adapter);
         Log.d("Activity", "ProfileListFragment#onCreate called.");

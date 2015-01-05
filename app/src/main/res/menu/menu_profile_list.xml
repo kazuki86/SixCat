@@ -2,13 +2,13 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item android:id="@+id/menu_profile_list_profile_register"
-        android:title="prof+"
+        android:title="@string/menu_button_register_profile"
         app:showAsAction="always" />
     <item android:id="@+id/menu_profile_list_appointment_list"
-        android:title="appo list"
+        android:title="@string/menu_button_appointment_list"
         app:showAsAction="always" />
     <item android:id="@+id/menu_profile_list_appointment_register"
-        android:title="appo+"
+        android:title="@string/menu_button_register_appointment"
         app:showAsAction="ifRoom" />
 
 </menu>
