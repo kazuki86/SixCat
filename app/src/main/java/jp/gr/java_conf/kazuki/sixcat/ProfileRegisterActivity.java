@@ -2,6 +2,7 @@ package jp.gr.java_conf.kazuki.sixcat;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -27,7 +28,10 @@ import android.widget.TextView;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import jp.gr.java_conf.kazuki.sixcat.data.SixCatSQLiteOpenHelper;
@@ -71,8 +75,8 @@ public class ProfileRegisterActivity extends ActionBarActivity {
         if (id == R.id.action_profile_register_save) {
 
             PlaceholderFragment fragment = (PlaceholderFragment)getSupportFragmentManager().findFragmentById(R.id.container);
-            EditText edit_name= (EditText)fragment.getView().findViewById(R.id.et_profile_edit_name);
-            showDialog("save result", "name:" + edit_name.getText().toString());
+//            EditText edit_name= (EditText)fragment.getView().findViewById(R.id.et_profile_edit_name);
+//            showDialog("save result", "name:" + edit_name.getText().toString());
             long profile_id = save();
             if ( profile_id != -1 ) {
                 Intent detailIntent = new Intent(this, ProfileDetailActivity.class);
@@ -106,10 +110,10 @@ public class ProfileRegisterActivity extends ActionBarActivity {
                 View child = containerView.getChildAt(i);
                 String key_id = (String)child.getTag(R.string.tag_key_id);
                 Integer sequence = (Integer)child.getTag(R.string.tag_key_sequence);
+                Integer value_type = (Integer)child.getTag(R.string.tag_key_type);
                 if (key_id == null || sequence == null) continue;
-                //TODO keyごとに探すIDを変える
-                EditText editText = (EditText) child.findViewById(R.id.txt_profile_edit_element);
-                String value = editText.getText().toString();
+                String value = getInputValue(child, value_type);
+                if (value == null) continue;
                 values.add(new ProfileDetail(Long.valueOf(key_id), sequence, value));
             }
 
@@ -126,10 +130,31 @@ public class ProfileRegisterActivity extends ActionBarActivity {
             db.endTransaction();
 
         } catch(RuntimeException e) {
-            throw e;
-//            return -1;
+            return -1;
         }
         return id;
+    }
+
+    private String getInputValue(View child, Integer value_type) {
+        String value = null;
+        switch(value_type){
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+            case 6:
+                EditText editText = (EditText) child.findViewById(R.id.txt_profile_edit_element);
+                value = editText.getText().toString();
+                break;
+            case 5:
+                value = null;
+                break;
+            case 7:
+                ImageView imageView = (ImageView) child.findViewById(R.id.img_profile_edit_element);
+                value = (String)imageView.getTag(R.string.tag_image_file_path);
+                break;
+        }
+        return value;
     }
 
     private View getView(int id) {
@@ -165,19 +190,82 @@ public class ProfileRegisterActivity extends ActionBarActivity {
 
             while(cursor.moveToNext()){
 
-                View row = inflater.inflate(R.layout.partial_profile_edit_element_text, null);
+
                 String key_id = cursor.getString(cursor.getColumnIndex("_id"));
+                int value_type =  cursor.getInt(cursor.getColumnIndex("value_type_id"));
+                String label_str = cursor.getString(cursor.getColumnIndex("name"));
                 int sequence = 1;
+
+
+                View row = null;
+                int content_view_id = R.id.txt_profile_edit_element;
+                // 1:数値、2:単一行テキスト、3:複数行テキスト、4:英数字、5:選択、6:日付、7:画像
+                switch(value_type) {
+                    case 1:
+                    case 2:
+                    case 3:
+                    case 4:
+                        //
+                        row = inflater.inflate(R.layout.partial_profile_edit_element_text, null);
+                        break;
+                    case 5:
+                        //
+                        break;
+                    case 6:
+                        //
+                        row = inflater.inflate(R.layout.partial_profile_edit_element_date, null);
+                        final EditText editText = (EditText) row.findViewById(R.id.txt_profile_edit_element);
+
+                        editText.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                DatePickerDialog.OnDateSetListener DateSetListener = new DatePickerDialog.OnDateSetListener() {
+                                    public void onDateSet(android.widget.DatePicker datePicker, int year,
+                                                          int monthOfYear, int dayOfMonth) {
+                                        editText.setText("" + year + "/" + (monthOfYear+1) + "/" + dayOfMonth);
+                                    }
+                                };
+
+                                // 日付情報の初期設定
+                                Calendar calendar = Calendar.getInstance();
+                                try {
+                                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+                                    dateFormat.setLenient(false);
+                                    java.util.Date date = dateFormat.parse(editText.getText().toString());
+                                    calendar.setTime(date);
+                                }catch( ParseException e ) {}
+
+                                DatePickerDialog dialog = new DatePickerDialog(
+                                        getActivity(),
+                                        android.R.style.Theme_Light,
+                                        DateSetListener,
+                                        calendar.get(Calendar.YEAR),
+                                        calendar.get(Calendar.MONTH),
+                                        calendar.get(Calendar.DAY_OF_MONTH)
+                                );
+                                dialog.show();
+                            }
+                        });
+                        break;
+                    case 7:
+                        row = inflater.inflate(R.layout.partial_profile_edit_element_image, null);
+                        ImageView imageView = (ImageView) row.findViewById(R.id.img_profile_edit_element);
+                        imageView.setOnClickListener(new ImageClickListener(R.id.img_profile_edit_element));
+                        content_view_id = R.id.img_profile_edit_element;
+                        break;
+                }
 
                 row.setTag(R.string.tag_key_id, key_id);
                 row.setTag(R.string.tag_key_sequence, sequence);
+                row.setTag(R.string.tag_key_type, value_type);
 
                 TextView label = (TextView) row.findViewById(R.id.lbl_profile_edit_element);
-                label.setText(cursor.getString(cursor.getColumnIndex("name")));
+                label.setText(label_str);
 
-                EditText editText = (EditText) row.findViewById(R.id.txt_profile_edit_element);
-                editText.setTag(R.string.tag_key_id, key_id);
-                editText.setTag(R.string.tag_key_sequence, sequence);
+                View contentView = row.findViewById(content_view_id);
+                contentView.setTag(R.string.tag_key_id, key_id);
+                contentView.setTag(R.string.tag_key_sequence, sequence);
+                contentView.setTag(R.string.tag_key_type, value_type);
 
                 containerView.addView(row);
             }

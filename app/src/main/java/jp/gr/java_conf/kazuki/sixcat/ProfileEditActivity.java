@@ -82,12 +82,12 @@ public class ProfileEditActivity extends ActionBarActivity {
         int id = item.getItemId();
 
         PlaceholderFragment fragment = (PlaceholderFragment)getSupportFragmentManager().findFragmentById(R.id.container);
-        EditText edit_name= (EditText)fragment.getView().findViewById(R.id.et_profile_edit_name);
+//        EditText edit_name= (EditText)fragment.getView().findViewById(R.id.et_profile_edit_name);
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_profile_edit_save) {
 
-            showDialog("update result", "name:" + edit_name.getText().toString());
+//            showDialog("update result", "name:" + edit_name.getText().toString());
             boolean result = save();
             if (result ) {
                 Intent detailIntent = new Intent(this, ProfileDetailActivity.class);
@@ -101,7 +101,7 @@ public class ProfileEditActivity extends ActionBarActivity {
 
             AlertDialog.Builder dialog = new AlertDialog.Builder(this);
             dialog.setTitle("Confirm");
-            dialog.setMessage(edit_name.getText().toString() + "さんのデータを本当に削除しますか？");
+            dialog.setMessage("本当に削除しますか？");
             dialog.setPositiveButton("YES",new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
