@@ -8,6 +8,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 
@@ -88,25 +90,51 @@ public class ProfileDetailFragment extends Fragment {
         // Show the dummy content as text in a TextView.
         if (cursor != null) {
 
-            while(cursor.moveToNext()) {
-                //TODO ここで、各値に応じたViewを動的にセットする
-                int key_id = Integer.valueOf(cursor.getString(cursor.getColumnIndex("key_id")));
-                String value = cursor.getString(cursor.getColumnIndex("value"));
-                switch(key_id) {
-                    case 1://name
-                        ((TextView) rootView.findViewById(R.id.txt_profile_detail_name)).setText(value);
-                        break;
-                    case 2://kana
-                        ((TextView) rootView.findViewById(R.id.txt_profile_detail_memo)).setText(value);
-                        break;
-                    case 3://nickname
-                        ((TextView) rootView.findViewById(R.id.txt_profile_detail_age)).setText(value);
-                        break;
-                    case 4://birthday
-                        ((TextView) rootView.findViewById(R.id.txt_profile_detail_address)).setText(value);
-                        break;
+            LinearLayout containerView = (LinearLayout)rootView.findViewById(R.id.container_profile_detail);
+
+            while(cursor.moveToNext()){
+
+                String key_id = cursor.getString(cursor.getColumnIndex("_id"));
+                String value =  cursor.getString(cursor.getColumnIndex("value"));
+                String sequence_str =  cursor.getString(cursor.getColumnIndex("sequence"));
+                int sequence = (sequence_str == null) ? 1 : Integer.valueOf(sequence_str);
+                String label_str = cursor.getString(cursor.getColumnIndex("name")) + ((sequence>1?sequence:""));
+
+                if (value == null) {
+                    continue;
                 }
+
+                View row = inflater.inflate(R.layout.partial_profile_detail_element_text, null);
+
+                TextView label = (TextView) row.findViewById(R.id.lbl_profile_detail_element);
+                label.setText(label_str);
+
+                TextView textView = (TextView) row.findViewById(R.id.txt_profile_detail_element);
+                textView.setText(value);
+
+                containerView.addView(row);
             }
+
+
+//            while(cursor.moveToNext()) {
+//                //TODO ここで、各値に応じたViewを動的にセットする
+//                int key_id = Integer.valueOf(cursor.getString(cursor.getColumnIndex("key_id")));
+//                String value = cursor.getString(cursor.getColumnIndex("value"));
+//                switch(key_id) {
+//                    case 1://name
+//                        ((TextView) rootView.findViewById(R.id.txt_profile_detail_name)).setText(value);
+//                        break;
+//                    case 2://kana
+//                        ((TextView) rootView.findViewById(R.id.txt_profile_detail_memo)).setText(value);
+//                        break;
+//                    case 3://nickname
+//                        ((TextView) rootView.findViewById(R.id.txt_profile_detail_age)).setText(value);
+//                        break;
+//                    case 4://birthday
+//                        ((TextView) rootView.findViewById(R.id.txt_profile_detail_address)).setText(value);
+//                        break;
+//                }
+//            }
 //            ((TextView) rootView.findViewById(R.id.txt_profile_detail_name)).setText(cursor.getString(cursor.getColumnIndex("name")));
 //            ((TextView) rootView.findViewById(R.id.txt_profile_detail_address)).setText(cursor.getString(cursor.getColumnIndex("birthday")));
 
