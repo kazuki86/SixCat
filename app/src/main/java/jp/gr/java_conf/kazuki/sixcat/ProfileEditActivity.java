@@ -202,12 +202,12 @@ public class ProfileEditActivity extends ActionBarActivity {
         private Cursor cursor;
 
 
-        private final int IDX_ID = 0;
-        private final int IDX_STATUS = 1;
-        private final int IDX_NAME = 2;
-        private final int IDX_KANA = 3;
-        private final int IDX_NICKNAME = 4;
-        private final int IDX_BIRTHDAY = 5;
+//        private final int IDX_ID = 0;
+//        private final int IDX_STATUS = 1;
+//        private final int IDX_NAME = 2;
+//        private final int IDX_KANA = 3;
+//        private final int IDX_NICKNAME = 4;
+//        private final int IDX_BIRTHDAY = 5;
 
         public PlaceholderFragment() {
             super();
@@ -227,10 +227,10 @@ public class ProfileEditActivity extends ActionBarActivity {
                     ,null,null,null);
             cursor.moveToFirst();
 
-            ((EditText) rootView.findViewById(R.id.et_profile_edit_name)).setText(cursor.getString(IDX_NAME));
-            ((EditText) rootView.findViewById(R.id.et_profile_edit_kana)).setText(cursor.getString(IDX_KANA));
-            ((EditText) rootView.findViewById(R.id.et_profile_edit_nickname)).setText(cursor.getString(IDX_NICKNAME));
-            ((EditText) rootView.findViewById(R.id.et_profile_edit_birthday)).setText(cursor.getString(IDX_BIRTHDAY));
+            ((EditText) rootView.findViewById(R.id.et_profile_edit_name)).setText(cursor.getString(cursor.getColumnIndex("name")));
+            ((EditText) rootView.findViewById(R.id.et_profile_edit_kana)).setText(cursor.getString(cursor.getColumnIndex("kana")));
+            ((EditText) rootView.findViewById(R.id.et_profile_edit_nickname)).setText(cursor.getString(cursor.getColumnIndex("nickname")));
+            ((EditText) rootView.findViewById(R.id.et_profile_edit_birthday)).setText(cursor.getString(cursor.getColumnIndex("birthday")));
         }
     }
 

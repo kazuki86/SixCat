@@ -3,6 +3,8 @@ package jp.gr.java_conf.kazuki.sixcat;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -17,12 +19,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+
+import jp.gr.java_conf.kazuki.sixcat.data.SixCatSQLiteOpenHelper;
 
 /**
  * Created by kazuki on 2015/01/03.
@@ -39,6 +44,7 @@ public abstract class AbstractProfileEditFragment extends Fragment {
 
     private String imageFileName;
 
+    private SQLiteDatabase db;
 
     public AbstractProfileEditFragment() {
     }
@@ -48,6 +54,22 @@ public abstract class AbstractProfileEditFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_profile_edit, container, false);
 
+        LinearLayout containerView = (LinearLayout)rootView.findViewById(R.id.container_profile_edit);
+        Cursor cursor = getProfileKeyMasterCursor();
+
+        while(cursor.moveToNext()){
+
+            View row = inflater.inflate(R.layout.partial_profile_edit_element_text, null);
+
+            TextView label = (TextView) row.findViewById(R.id.lbl_profile_edit_element);
+            label.setText(cursor.getString(cursor.getColumnIndex("name")));
+
+            EditText editText = (EditText) row.findViewById(R.id.txt_profile_edit_element);
+            editText.setTag(R.string.tag_key_id, cursor.getString(cursor.getColumnIndex("_id")));
+            editText.setTag(R.string.tag_key_sequence, 1);
+
+            containerView.addView(row);
+        }
 
         //img_profile_edit_portrait
         final ImageView portrait = (ImageView)rootView.findViewById(R.id.img_profile_edit_portrait);
@@ -73,6 +95,21 @@ public abstract class AbstractProfileEditFragment extends Fragment {
         return rootView;
     }
 
+    private Cursor getProfileKeyMasterCursor() {
+        if (db == null) {
+            SixCatSQLiteOpenHelper helper = new SixCatSQLiteOpenHelper(getActivity());
+            db = helper.getReadableDatabase();
+        }
+
+        return db.query("profile_key_master",
+                null,
+                "use_flg = ?",
+                new String[]{"1"},
+                null,
+                null,
+                "sort_order"
+        );
+    }
     abstract protected void initializeView(View rootView);
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {

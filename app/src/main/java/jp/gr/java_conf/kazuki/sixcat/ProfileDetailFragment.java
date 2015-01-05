@@ -37,12 +37,12 @@ public class ProfileDetailFragment extends Fragment {
 
     private Cursor cursor;
 
-    private final int IDX_ID = 0;
-    private final int IDX_STATUS = 1;
-    private final int IDX_NAME = 2;
-    private final int IDX_KANA = 3;
-    private final int IDX_NICKNAME = 4;
-    private final int IDX_BIRTHDAY = 5;
+//    private final int IDX_ID = 0;
+//    private final int IDX_STATUS = 1;
+//    private final int IDX_NAME = 2;
+//    private final int IDX_KANA = 3;
+//    private final int IDX_NICKNAME = 4;
+//    private final int IDX_BIRTHDAY = 5;
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
@@ -62,11 +62,15 @@ public class ProfileDetailFragment extends Fragment {
 
             db = helper.getReadableDatabase();
             //sample
-            cursor = db.query("view_profile_list",
-                    new String[]{"_id","status","name","kana","nickname","birthday"},
-                    "_id = ?",new String[]{getArguments().getString(ARG_ITEM_ID)}
+//            cursor = db.query("view_profile_list",
+//                    new String[]{"_id","status","name","kana","nickname","birthday"},
+//                    "_id = ?",new String[]{getArguments().getString(ARG_ITEM_ID)}
+//                    ,null,null,null);
+            cursor = db.query("view_profile_detail",
+                    null,
+                    "profile_id = ?",new String[]{getArguments().getString(ARG_ITEM_ID)}
                     ,null,null,null);
-            cursor.moveToFirst();
+            //cursor.moveToFirst();
 
             Log.d("Debug", "ccc");
             // Load the dummy content specified by the fragment
@@ -84,9 +88,27 @@ public class ProfileDetailFragment extends Fragment {
         // Show the dummy content as text in a TextView.
         if (cursor != null) {
 
-            ((TextView) rootView.findViewById(R.id.txt_profile_detail_name)).setText(cursor.getString(IDX_NAME));
-
-            ((TextView) rootView.findViewById(R.id.txt_profile_detail_address)).setText(cursor.getString(IDX_BIRTHDAY));
+            while(cursor.moveToNext()) {
+                //TODO ここで、各値に応じたViewを動的にセットする
+                int key_id = Integer.valueOf(cursor.getString(cursor.getColumnIndex("key_id")));
+                String value = cursor.getString(cursor.getColumnIndex("value"));
+                switch(key_id) {
+                    case 1://name
+                        ((TextView) rootView.findViewById(R.id.txt_profile_detail_name)).setText(value);
+                        break;
+                    case 2://kana
+                        ((TextView) rootView.findViewById(R.id.txt_profile_detail_memo)).setText(value);
+                        break;
+                    case 3://nickname
+                        ((TextView) rootView.findViewById(R.id.txt_profile_detail_age)).setText(value);
+                        break;
+                    case 4://birthday
+                        ((TextView) rootView.findViewById(R.id.txt_profile_detail_address)).setText(value);
+                        break;
+                }
+            }
+//            ((TextView) rootView.findViewById(R.id.txt_profile_detail_name)).setText(cursor.getString(cursor.getColumnIndex("name")));
+//            ((TextView) rootView.findViewById(R.id.txt_profile_detail_address)).setText(cursor.getString(cursor.getColumnIndex("birthday")));
 
         }
 

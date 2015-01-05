@@ -10,7 +10,7 @@ import android.util.Log;
  */
 public class SixCatSQLiteOpenHelper  extends SQLiteOpenHelper {
 
-    static final int VERSION = 18;
+    static final int VERSION = 19;
 
     public SixCatSQLiteOpenHelper(Context context) {
         super(context, "six_cat", null, VERSION);
@@ -81,6 +81,13 @@ public class SixCatSQLiteOpenHelper  extends SQLiteOpenHelper {
                 + "     on  hd._id = dt_birthday.profile_id "
                 + "     and dt_birthday.key_id = 4;";
 
+        String create_sql_view_profile_detail
+                = " create view view_profile_detail as select "
+                + "   *"
+                + " from"
+                + "   profile_key_master ms"
+                + "   left join profile_detail dt on ms._id = dt.key_id;";
+
         String[] insert_sql_value_type_master_list = new String[]{
                 "insert into value_type_master values( 1, '数値'); ",
                 "insert into value_type_master values( 2, '単一行テキスト'); ",
@@ -116,6 +123,7 @@ public class SixCatSQLiteOpenHelper  extends SQLiteOpenHelper {
         db.execSQL(create_sql_profile_hd);
         db.execSQL(create_sql_profile_detail);
         db.execSQL(create_sql_view_profile_list);
+        db.execSQL(create_sql_view_profile_detail);
 
         for(String sql : insert_sql_value_type_master_list) {
             db.execSQL(sql);
