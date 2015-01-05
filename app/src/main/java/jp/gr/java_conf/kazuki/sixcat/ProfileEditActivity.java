@@ -8,6 +8,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -18,9 +20,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -154,10 +160,40 @@ public class ProfileEditActivity extends ActionBarActivity {
 
             //TODO ここらへんは、動的ビューにしたら変更する。
             List<ProfileDetail> values = new ArrayList<ProfileDetail>();
-            values.add(new ProfileDetail(1,1,((EditText)getView(R.id.et_profile_edit_name)).getText().toString()));
-            values.add(new ProfileDetail(2,1,((EditText)getView(R.id.et_profile_edit_kana)).getText().toString()));
-            values.add(new ProfileDetail(3,1,((EditText)getView(R.id.et_profile_edit_nickname)).getText().toString()));
-            values.add(new ProfileDetail(4,1,((EditText)getView(R.id.et_profile_edit_birthday)).getText().toString()));
+
+
+            LinearLayout containerView = (LinearLayout)getView(R.id.container_profile_edit);
+            for(int i=0; i<containerView.getChildCount(); i++) {
+                View child = containerView.getChildAt(i);
+                String key_id = (String)child.getTag(R.string.tag_key_id);
+                Integer sequence = (Integer)child.getTag(R.string.tag_key_sequence);
+                Integer value_type = (Integer)child.getTag(R.string.tag_key_type);
+                if (key_id == null || sequence == null) continue;
+                String value = null;
+                switch(value_type){
+                    case 1:
+                    case 2:
+                    case 3:
+                    case 4:
+                    case 6:
+                        EditText editText = (EditText) child.findViewById(R.id.txt_profile_edit_element);
+                        value = editText.getText().toString();
+                        break;
+                    case 5:
+                        continue;
+                        //break;
+                    case 7:
+                        ImageView imageView = (ImageView) child.findViewById(R.id.img_profile_edit_element);
+                        value = (String)imageView.getTag(R.string.tag_image_file_path);
+                        break;
+                }
+                values.add(new ProfileDetail(Long.valueOf(key_id), sequence, value));
+            }
+
+//            values.add(new ProfileDetail(1,1,((EditText)getView(R.id.et_profile_edit_name)).getText().toString()));
+//            values.add(new ProfileDetail(2,1,((EditText)getView(R.id.et_profile_edit_kana)).getText().toString()));
+//            values.add(new ProfileDetail(3,1,((EditText)getView(R.id.et_profile_edit_nickname)).getText().toString()));
+//            values.add(new ProfileDetail(4,1,((EditText)getView(R.id.et_profile_edit_birthday)).getText().toString()));
 
 
             db.delete("profile_detail","profile_id = ?",new String[]{Long.toString(profile_id)});
@@ -232,7 +268,8 @@ public class ProfileEditActivity extends ActionBarActivity {
                 String label_str = cursor.getString(cursor.getColumnIndex("name")) + ((sequence>1?sequence:""));
 
                 View row = null;
-                // 1:数値、2:単一行テキスト、3:複数行テキスト、4:英数字、5:選択、6:日付、
+                int content_view_id = R.id.txt_profile_edit_element;
+                // 1:数値、2:単一行テキスト、3:複数行テキスト、4:英数字、5:選択、6:日付、7:画像
                 switch(value_type) {
                     case 1:
                     case 2:
@@ -240,6 +277,11 @@ public class ProfileEditActivity extends ActionBarActivity {
                     case 4:
                         //
                         row = inflater.inflate(R.layout.partial_profile_edit_element_text, null);
+
+                        EditText editView = (EditText) row.findViewById(R.id.txt_profile_edit_element);
+                        if (value != null) {
+                            editView.setText(value);
+                        }
                         break;
                     case 5:
                         //
@@ -248,7 +290,9 @@ public class ProfileEditActivity extends ActionBarActivity {
                         //
                         row = inflater.inflate(R.layout.partial_profile_edit_element_date, null);
                         final EditText editText = (EditText) row.findViewById(R.id.txt_profile_edit_element);
-
+                        if (value != null) {
+                            editText.setText(value);
+                        }
                         editText.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -278,20 +322,39 @@ public class ProfileEditActivity extends ActionBarActivity {
                             }
                         });
                         break;
+                    case 7:
+                        row = inflater.inflate(R.layout.partial_profile_edit_element_image, null);
+                        ImageView imageView = (ImageView) row.findViewById(R.id.img_profile_edit_element);
+                        imageView.setOnClickListener(new ImageClickListener(R.id.img_profile_edit_element));
+                        content_view_id = R.id.img_profile_edit_element;
 
+                        if (value != null) {
+                            imageView.setTag(R.string.tag_image_file_path,value);
+                            //TODO ファイル名から画像をロードしてセットする。
+                            try {
+                                File srcFile = new File(value);
+                                FileInputStream fis = new FileInputStream(srcFile);
+                                Bitmap bm = BitmapFactory.decodeStream(fis);
+                                imageView.setImageBitmap(bm);
+                            } catch (FileNotFoundException e) {
+                                Log.d("IMAGE ERROR",e.toString());
+                                e.printStackTrace();
+                            }
+                        }
+                        break;
                 }
                 row.setTag(R.string.tag_key_id, key_id);
                 row.setTag(R.string.tag_key_sequence, sequence);
+                row.setTag(R.string.tag_key_type, value_type);
 
                 TextView label = (TextView) row.findViewById(R.id.lbl_profile_edit_element);
                 label.setText(label_str);
 
-                EditText editText = (EditText) row.findViewById(R.id.txt_profile_edit_element);
-                if (value != null) {
-                    editText.setText(value);
-                }
-                editText.setTag(R.string.tag_key_id, key_id);
-                editText.setTag(R.string.tag_key_sequence, sequence);
+                View contentView =  row.findViewById(content_view_id);
+
+                contentView.setTag(R.string.tag_key_id, key_id);
+                contentView.setTag(R.string.tag_key_sequence, sequence);
+                contentView.setTag(R.string.tag_key_type, value_type);
 
                 containerView.addView(row);
             }
@@ -314,7 +377,7 @@ public class ProfileEditActivity extends ActionBarActivity {
         private Cursor getProfileKeyMasterWithExistValueCursor(String profile_id) {
             return db.query("view_profile_detail",
                     null,
-                    "profile_id = ? and use_flg = ?",
+                    "(profile_id = ? or profile_id is NULL) and use_flg = ?",
                     new String[]{profile_id, "1"},
                     null,
                     null,

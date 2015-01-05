@@ -10,7 +10,7 @@ import android.util.Log;
  */
 public class SixCatSQLiteOpenHelper  extends SQLiteOpenHelper {
 
-    static final int VERSION = 19;
+    static final int VERSION = 20;
 
     public SixCatSQLiteOpenHelper(Context context) {
         super(context, "six_cat", null, VERSION);
@@ -33,7 +33,7 @@ public class SixCatSQLiteOpenHelper  extends SQLiteOpenHelper {
                 + " description text, "
                 + " sort_order integer not null default 0, "
                 + " plural_flg integer not null default 0, "
-                + " value_type_id integer not null, " // 1:数値、2:単一行テキスト、3:複数行テキスト、4:英数字、5:選択、6:日付、
+                + " value_type_id integer not null, " // 1:数値、2:単一行テキスト、3:複数行テキスト、4:英数字、5:選択、6:日付、7:画像
                 + " initial_value text, "
                 + " system_flg integer not null default 0, "
                 + " use_flg integer not null default 1, "
@@ -95,12 +95,14 @@ public class SixCatSQLiteOpenHelper  extends SQLiteOpenHelper {
                 "insert into value_type_master values( 4, '英数字'); ",
                 "insert into value_type_master values( 5, '選択'); ",
                 "insert into value_type_master values( 6, '日付'); ",
+                "insert into value_type_master values( 7, '画像'); ",
         };
         String[] insert_sql_profile_key_master_list = new String[]{
-                "insert into profile_key_master values ( 1,'名前'           ,'',1,0,2,'',0,1,null,null,null,null,null,null,null,null,null,null);",
-                "insert into profile_key_master values ( 2,'よみがな'       ,'',2,0,2,'',0,1,null,null,null,null,null,null,null,null,null,null);",
-                "insert into profile_key_master values ( 3,'ニックネーム'   ,'',3,0,2,'',0,1,null,null,null,null,null,null,null,null,null,null);",
-                "insert into profile_key_master values ( 4,'誕生日'         ,'',4,0,6,'',0,1,null,null,null,null,null,null,null,null,null,null);",
+                "insert into profile_key_master values ( 1,'名前'           ,'',2,0,2,'',0,1,null,null,null,null,null,null,null,null,null,null);",
+                "insert into profile_key_master values ( 2,'よみがな'       ,'',3,0,2,'',0,1,null,null,null,null,null,null,null,null,null,null);",
+                "insert into profile_key_master values ( 3,'ニックネーム'   ,'',4,0,2,'',0,1,null,null,null,null,null,null,null,null,null,null);",
+                "insert into profile_key_master values ( 4,'誕生日'         ,'',5,0,6,'',0,1,null,null,null,null,null,null,null,null,null,null);",
+                "insert into profile_key_master values ( 5,'写真'           ,'',1,0,7,'',0,1,null,null,null,null,null,null,null,null,null,null);",
         };
         String[] insert_sql_profile_list = new String[]{
                 "insert into profile_hd values ( 1, 0);",
@@ -145,6 +147,7 @@ public class SixCatSQLiteOpenHelper  extends SQLiteOpenHelper {
         String drop_sql_profile_hd          = "drop table profile_hd;";
         String drop_sql_profile_detail      = "drop table profile_detail;";
         String drop_sql_view_profile_list   = "drop view view_profile_list;";
+        String drop_sql_view_profile_detail   = "drop view view_profile_detail;";
 
         try {
             db.execSQL(drop_sql_value_type_master);
@@ -152,6 +155,7 @@ public class SixCatSQLiteOpenHelper  extends SQLiteOpenHelper {
             db.execSQL(drop_sql_profile_hd);
             db.execSQL(drop_sql_profile_detail);
             db.execSQL(drop_sql_view_profile_list);
+            db.execSQL(drop_sql_view_profile_detail);
         } catch(Exception e){
 
             Log.d("DB",e.toString());

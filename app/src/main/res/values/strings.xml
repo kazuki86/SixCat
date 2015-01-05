@@ -11,4 +11,6 @@
 
     <string name="tag_key_id">100</string>
     <string name="tag_key_sequence">101</string>
+    <string name="tag_key_type">102</string>
+    <string name="tag_image_file_path">103</string>
 </resources>

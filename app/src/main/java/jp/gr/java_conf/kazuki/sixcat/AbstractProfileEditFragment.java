@@ -64,29 +64,43 @@ public abstract class AbstractProfileEditFragment extends Fragment {
 
         initializeView(inflater, rootView);
 
-        //img_profile_edit_portrait
-        final ImageView portrait = (ImageView)rootView.findViewById(R.id.img_profile_edit_portrait);
-        if (portrait != null) {
-            portrait.setOnClickListener(new View.OnClickListener() {
-
-                @Override
-                public void onClick(View v) {
-                    //実行フロー
-//                        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                    //これだとギャラリー専門が開きます。
-                    Intent intent = new Intent(Intent.ACTION_PICK);
-                    intent.setType("image/*");
-                    //createChooserを使うと選択ダイアログのタイトルを変更する事ができます。
-                    startActivityForResult(Intent.createChooser(intent, "select"), REQUEST_ACTION_PICK);
-                    //デフォルトで「アプリ選択」と出ます。
-                    //startActivityForResult(intent, REQUEST_ACTION_PICK);
-                }
-            });
-        }
+//        //img_profile_edit_portrait
+//        final ImageView portrait = (ImageView)rootView.findViewById(R.id.img_profile_edit_portrait);
+//        if (portrait != null) {
+//            portrait.setOnClickListener(new View.OnClickListener() {
+//
+//                @Override
+//                public void onClick(View v) {
+//                    //実行フロー
+////                        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+//                    //これだとギャラリー専門が開きます。
+//                    Intent intent = new Intent(Intent.ACTION_PICK);
+//                    intent.setType("image/*");
+//                    //createChooserを使うと選択ダイアログのタイトルを変更する事ができます。
+//                    startActivityForResult(Intent.createChooser(intent, "select"), REQUEST_ACTION_PICK);
+//                    //デフォルトで「アプリ選択」と出ます。
+//                    //startActivityForResult(intent, REQUEST_ACTION_PICK);
+//                }
+//            });
+//        }
 
         return rootView;
     }
 
+    protected class ImageClickListener implements View.OnClickListener {
+
+        private int image_view_id;
+        ImageClickListener(int image_view_id){
+            this.image_view_id = image_view_id;
+        }
+        @Override
+        public void onClick(View v) {
+            Intent intent = new Intent(Intent.ACTION_PICK);
+            intent.putExtra(ARG_ITEM_ID,image_view_id);
+            intent.setType("image/*");
+            startActivityForResult(Intent.createChooser(intent, "select"), REQUEST_ACTION_PICK);
+        }
+    }
     abstract protected void initializeView(LayoutInflater inflater, View rootView);
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -101,11 +115,16 @@ public abstract class AbstractProfileEditFragment extends Fragment {
                     createFolderSaveImage(bm, getImageFileName());
                     iStream.close();
 
-                    ImageView imgView = (ImageView) getActivity().findViewById(R.id.img_profile_edit_portrait);
+                    int image_view_id = R.id.img_profile_edit_element;//TODO 一時策//data.getExtras().getInt(ARG_ITEM_ID);
+                    ImageView imgView = (ImageView) getActivity().findViewById(image_view_id);
                     imgView.setImageBitmap(bm);
+                    imgView.setTag(R.string.tag_image_file_path,
+                            Environment.getExternalStorageDirectory()
+                                    + "/" + imageDirectoryName
+                                    + imageFileName );
 
-                    EditText editText = (EditText)getActivity().findViewById(R.id.txt_profile_edit_portrait);
-                    editText.setText(imageFileName);
+//                    EditText editText = (EditText)getActivity().findViewById(R.id.txt_profile_edit_portrait);
+//                    editText.setText(imageFileName);
 
                 }catch (IOException e) {}
             }
