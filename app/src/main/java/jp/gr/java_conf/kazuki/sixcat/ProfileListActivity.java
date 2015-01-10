@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -33,20 +34,15 @@ public class ProfileListActivity extends ActionBarActivity
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
      * device.
      */
-    private boolean mTwoPane;
+    //private boolean mTwoPane;
+    private Boolean mTwoPane;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile_list);
 
-        if (findViewById(R.id.profile_detail_container) != null) {
-            // The detail container view will be present only in the
-            // large-screen layouts (res/values-large and
-            // res/values-sw600dp). If this view is present, then the
-            // activity should be in two-pane mode.
-            mTwoPane = true;
-
+        if (isTwoPane()) {
             // In two-pane mode, list items should be given the
             // 'activated' state when touched.
             ((ProfileListFragment) getSupportFragmentManager()
@@ -54,7 +50,6 @@ public class ProfileListActivity extends ActionBarActivity
                     .setActivateOnItemClick(true);
         }
 
-        // TODO: If exposing deep links into your app, handle intents here.
     }
 
     /**
@@ -87,8 +82,31 @@ public class ProfileListActivity extends ActionBarActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_profile_list, menu);
+
+        if (isTwoPane()) {
+            getMenuInflater().inflate(R.menu.menu_profile_list_twopane, menu);
+        } else {
+            getMenuInflater().inflate(R.menu.menu_profile_list, menu);
+
+        }
+        updateMenuEnabled(menu);
         return true;
+    }
+
+    @Override
+    public void onAttachFragment(Fragment fragment){
+        //メニュー再表示のために一度破棄させる。
+        invalidateOptionsMenu();
+    }
+
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        updateMenuEnabled(menu);
+        return true;
+    }
+
+    private void updateMenuEnabled(Menu menu){
+        menu.findItem(R.id.menu_profile_detail_profile_edit)
+                .setEnabled(isDetailDisplayed());
     }
 
     @Override
@@ -100,6 +118,9 @@ public class ProfileListActivity extends ActionBarActivity
                 Intent intent = new Intent(this, ProfileRegisterActivity.class);
                 startActivity(intent);
 
+                break;
+            case R.id.menu_profile_detail_profile_edit:
+                showDialog("menu_profile_list_appointment_edit");
                 break;
             case R.id.menu_profile_list_appointment_list:
                 showDialog("menu_profile_list_appointment_list");
@@ -125,4 +146,22 @@ public class ProfileListActivity extends ActionBarActivity
         dialog.create();
         dialog.show();
     }
+
+    private boolean isTwoPane(){
+        if (mTwoPane == null) {
+            mTwoPane = (findViewById(R.id.profile_detail_container) != null);
+        }
+        return mTwoPane;
+    }
+
+    private boolean isDetailDisplayed(){
+        if (isTwoPane()) {
+            if (findViewById(R.id.profile_detail_container).findViewById(R.id.fragment_profile_detail_root) != null){
+                return true;
+            }
+        }
+        return false;
+    }
+
+
 }
