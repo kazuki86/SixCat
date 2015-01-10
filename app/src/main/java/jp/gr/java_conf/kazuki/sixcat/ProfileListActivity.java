@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -37,6 +38,8 @@ public class ProfileListActivity extends ActionBarActivity
     //private boolean mTwoPane;
     private Boolean mTwoPane;
 
+    private String current_item_id = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,6 +61,7 @@ public class ProfileListActivity extends ActionBarActivity
      */
     @Override
     public void onItemSelected(String id) {
+        current_item_id = id;
         if (mTwoPane) {
             // In two-pane mode, show the detail view in this activity by
             // adding or replacing the detail fragment using a
@@ -105,22 +109,30 @@ public class ProfileListActivity extends ActionBarActivity
     }
 
     private void updateMenuEnabled(Menu menu){
-        menu.findItem(R.id.menu_profile_detail_profile_edit)
-                .setEnabled(isDetailDisplayed());
+        MenuItem item = menu.findItem(R.id.menu_profile_detail_profile_edit);
+        if (item != null){
+            item.setEnabled(isDetailDisplayed());
+        }
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
+        Intent intent = null;
         switch(id) {
             case R.id.menu_profile_list_profile_register:
                 //showDialog("menu_profile_list_profile_register");
-                Intent intent = new Intent(this, ProfileRegisterActivity.class);
+                intent = new Intent(this, ProfileRegisterActivity.class);
                 startActivity(intent);
 
                 break;
             case R.id.menu_profile_detail_profile_edit:
-                showDialog("menu_profile_list_appointment_edit");
+
+                intent = new Intent(this, ProfileEditActivity.class);
+                String profile_id = current_item_id;
+                Log.d("Debug", profile_id);
+                intent.putExtra(AbstractProfileEditFragment.ARG_ITEM_ID, profile_id);
+                startActivity(intent);
                 break;
             case R.id.menu_profile_list_appointment_list:
                 showDialog("menu_profile_list_appointment_list");

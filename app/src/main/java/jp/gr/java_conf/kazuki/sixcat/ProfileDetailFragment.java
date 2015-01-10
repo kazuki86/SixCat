@@ -37,6 +37,7 @@ public class ProfileDetailFragment extends Fragment {
 
     private Cursor cursor;
 
+
 //    private final int IDX_ID = 0;
 //    private final int IDX_STATUS = 1;
 //    private final int IDX_NAME = 2;
@@ -147,4 +148,5 @@ public class ProfileDetailFragment extends Fragment {
 
         return rootView;
     }
+
 }
