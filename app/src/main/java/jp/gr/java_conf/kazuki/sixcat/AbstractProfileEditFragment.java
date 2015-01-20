@@ -26,6 +26,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Set;
 
 import jp.gr.java_conf.kazuki.sixcat.data.SixCatSQLiteOpenHelper;
 
@@ -35,6 +37,8 @@ import jp.gr.java_conf.kazuki.sixcat.data.SixCatSQLiteOpenHelper;
 public abstract class AbstractProfileEditFragment extends Fragment {
 
     public static final String ARG_ITEM_ID = "item_id";
+    public static final String KEY_BUILT_EDIT_FLG = "key_built_edit_flg";
+    public static final String KEY_EDIT_DATA = "key_edit_data";
 
     final int REQUEST_ACTION_PICK = 1;
 
@@ -45,6 +49,8 @@ public abstract class AbstractProfileEditFragment extends Fragment {
     private String imageFileName;
 
     protected SQLiteDatabase db;
+
+    protected boolean already_built_edit_flg = false;
 
     public AbstractProfileEditFragment() {
     }
@@ -61,8 +67,7 @@ public abstract class AbstractProfileEditFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_profile_edit, container, false);
 
 
-
-        initializeView(inflater, rootView);
+        initializeView(inflater, rootView, savedInstanceState);
 
 //        //img_profile_edit_portrait
 //        final ImageView portrait = (ImageView)rootView.findViewById(R.id.img_profile_edit_portrait);
@@ -87,6 +92,38 @@ public abstract class AbstractProfileEditFragment extends Fragment {
         return rootView;
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+    }
+//
+//    public  ArrayList<String> getInstanceState() {
+//        ArrayList<String> list = new ArrayList<String>();
+//        list.add("hello");
+//        return list;
+//    }
+//
+//    public void loadInstanceState(ArrayList<String> state) {
+//        String str = "";
+//        if (state != null){
+//            for(String val : state) {
+//                str += val;
+//            }
+//        }
+//        Log.d("load state", str);
+//    }
+//     public void onRestoreInstanceState(Bundle inState) {
+//
+//         ArrayList<String> list =inState.getStringArrayList(KEY_EDIT_DATA);
+//         String str = "";
+//         if (list != null){
+//             for(String val : list) {
+//                 str += val;
+//             }
+//         }
+//         Log.d("load state", str);
+//    }
+
     protected class ImageClickListener implements View.OnClickListener {
 
         private int image_view_id;
@@ -101,10 +138,9 @@ public abstract class AbstractProfileEditFragment extends Fragment {
             startActivityForResult(Intent.createChooser(intent, "select"), REQUEST_ACTION_PICK);
         }
     }
-    abstract protected void initializeView(LayoutInflater inflater, View rootView);
+    abstract protected void initializeView(LayoutInflater inflater, View rootView, Bundle savedInstanceState);
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.d("debug_kazuki", "onActivityResult called");
         if(resultCode == getActivity().RESULT_OK){
             if(requestCode == REQUEST_ACTION_PICK){
                 try {

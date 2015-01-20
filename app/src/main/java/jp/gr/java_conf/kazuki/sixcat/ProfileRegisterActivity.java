@@ -184,7 +184,7 @@ public class ProfileRegisterActivity extends ActionBarActivity {
             super();
         }
 
-        protected void initializeView(LayoutInflater inflater, View rootView){
+        protected void initializeView(LayoutInflater inflater, View rootView, Bundle savedInstanceState){
             LinearLayout containerView = (LinearLayout)rootView.findViewById(R.id.container_profile_edit);
             Cursor cursor = getProfileKeyMasterCursor();
 
