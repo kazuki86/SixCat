@@ -186,88 +186,30 @@ public class ProfileRegisterActivity extends ActionBarActivity {
 
         protected void initializeView(LayoutInflater inflater, View rootView, Bundle savedInstanceState){
             LinearLayout containerView = (LinearLayout)rootView.findViewById(R.id.container_profile_edit);
-            Cursor cursor = getProfileKeyMasterCursor();
-
-            while(cursor.moveToNext()){
 
 
-                String key_id = cursor.getString(cursor.getColumnIndex("_id"));
-                int value_type =  cursor.getInt(cursor.getColumnIndex("value_type_id"));
-                String label_str = cursor.getString(cursor.getColumnIndex("name"));
-                int sequence = 1;
 
+            if (savedInstanceState != null && savedInstanceState.containsKey(KEY_EDIT_DATA)) {
 
-                View row = null;
-                int content_view_id = R.id.txt_profile_edit_element;
-                // 1:数値、2:単一行テキスト、3:複数行テキスト、4:英数字、5:選択、6:日付、7:画像
-                switch(value_type) {
-                    case 1:
-                    case 2:
-                    case 3:
-                    case 4:
-                        //
-                        row = inflater.inflate(R.layout.partial_profile_edit_element_text, null);
-                        break;
-                    case 5:
-                        //
-                        break;
-                    case 6:
-                        //
-                        row = inflater.inflate(R.layout.partial_profile_edit_element_date, null);
-                        final EditText editText = (EditText) row.findViewById(R.id.txt_profile_edit_element);
-
-                        editText.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                DatePickerDialog.OnDateSetListener DateSetListener = new DatePickerDialog.OnDateSetListener() {
-                                    public void onDateSet(android.widget.DatePicker datePicker, int year,
-                                                          int monthOfYear, int dayOfMonth) {
-                                        editText.setText("" + year + "/" + (monthOfYear+1) + "/" + dayOfMonth);
-                                    }
-                                };
-
-                                // 日付情報の初期設定
-                                Calendar calendar = Calendar.getInstance();
-                                try {
-                                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
-                                    dateFormat.setLenient(false);
-                                    java.util.Date date = dateFormat.parse(editText.getText().toString());
-                                    calendar.setTime(date);
-                                }catch( ParseException e ) {}
-
-                                DatePickerDialog dialog = new DatePickerDialog(
-                                        getActivity(),
-                                        android.R.style.Theme_Light,
-                                        DateSetListener,
-                                        calendar.get(Calendar.YEAR),
-                                        calendar.get(Calendar.MONTH),
-                                        calendar.get(Calendar.DAY_OF_MONTH)
-                                );
-                                dialog.show();
-                            }
-                        });
-                        break;
-                    case 7:
-                        row = inflater.inflate(R.layout.partial_profile_edit_element_image, null);
-                        ImageView imageView = (ImageView) row.findViewById(R.id.img_profile_edit_element);
-                        imageView.setOnClickListener(new ImageClickListener(R.id.img_profile_edit_element));
-                        content_view_id = R.id.img_profile_edit_element;
-                        break;
+                ArrayList<ProfileParcelable> contents = savedInstanceState.getParcelableArrayList(KEY_EDIT_DATA);
+                for (ProfileParcelable profile : contents) {
+                    View row = createRowView(inflater, profile);
+                    containerView.addView(row);
                 }
+            } else {
+                Cursor cursor = getProfileKeyMasterCursor();
 
-                row.setTag(R.string.tag_key_id, key_id);
-                row.setTag(R.string.tag_key_sequence, sequence);
-                row.setTag(R.string.tag_key_type, value_type);
+                while (cursor.moveToNext()) {
+                    String key_id = cursor.getString(cursor.getColumnIndex("_id"));
+                    int value_type = cursor.getInt(cursor.getColumnIndex("value_type_id"));
+                    String label_str = cursor.getString(cursor.getColumnIndex("name"));
+                    int sequence = 1;
+                    String value = ""; //default value ?
 
-                TextView label = (TextView) row.findViewById(R.id.lbl_profile_edit_element);
-                label.setText(label_str);
-
-                View contentView = row.findViewById(content_view_id);
-                contentView.setTag(R.string.tag_key_id, key_id);
-                contentView.setTag(R.string.tag_key_sequence, sequence);
-                contentView.setTag(R.string.tag_key_type, value_type);
-
-                containerView.addView(row);
+                    ProfileParcelable profile = new ProfileParcelable(key_id, sequence, value, value_type, label_str);
+                    View row = createRowView(inflater, profile);
+                    containerView.addView(row);
+                }
             }
         }
 
@@ -281,6 +223,7 @@ public class ProfileRegisterActivity extends ActionBarActivity {
                     "sort_order"
             );
         }
+
     }
 
     class ProfileDetail{

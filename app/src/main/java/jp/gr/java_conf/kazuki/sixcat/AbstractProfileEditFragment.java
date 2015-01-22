@@ -1,5 +1,6 @@
 package jp.gr.java_conf.kazuki.sixcat;
 
+import android.app.DatePickerDialog;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Intent;
@@ -23,10 +24,15 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Set;
 
 import jp.gr.java_conf.kazuki.sixcat.data.SixCatSQLiteOpenHelper;
@@ -92,10 +98,6 @@ public abstract class AbstractProfileEditFragment extends Fragment {
         return rootView;
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-    }
 //
 //    public  ArrayList<String> getInstanceState() {
 //        ArrayList<String> list = new ArrayList<String>();
@@ -247,6 +249,191 @@ public abstract class AbstractProfileEditFragment extends Fragment {
 
     public static String getImageFileName(){
         return "img_" + System.currentTimeMillis() + ".jpg";
+    }
+
+
+
+
+
+    protected View createRowView(LayoutInflater inflater, ProfileParcelable profile) {
+
+//            Log.d("construct data", "       " + key_id + "," + value);
+        View row = null;
+        int content_view_id = R.id.txt_profile_edit_element;
+        // 1:数値、2:単一行テキスト、3:複数行テキスト、4:英数字、5:選択、6:日付、7:画像
+        switch (profile.value_type) {
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+                //
+                row = getTextView(inflater, profile.value);
+                break;
+            case 5:
+                //
+                break;
+            case 6:
+                //
+                row = getDateView(inflater, profile.value);
+                break;
+            case 7:
+                row = getImageView(inflater, profile.value);
+                content_view_id = R.id.img_profile_edit_element;
+                break;
+        }
+        row.setTag(R.string.tag_key_id, profile.key_id);
+        row.setTag(R.string.tag_key_sequence, profile.sequence);
+        row.setTag(R.string.tag_key_type, profile.value_type);
+
+        TextView label = (TextView) row.findViewById(R.id.lbl_profile_edit_element);
+        label.setText(profile.label_str);
+
+        View contentView = row.findViewById(content_view_id);
+
+        contentView.setTag(R.string.tag_key_id, profile.key_id);
+        contentView.setTag(R.string.tag_key_sequence, profile.sequence);
+        contentView.setTag(R.string.tag_key_type, profile.value_type);
+
+        return row;
+    }
+    private View getTextView(LayoutInflater inflater, String value) {
+        View row;
+        row = inflater.inflate(R.layout.partial_profile_edit_element_text, null);
+
+        EditText editView = (EditText) row.findViewById(R.id.txt_profile_edit_element);
+        if (value != null) {
+            editView.setText(value);
+        }
+        editView.setSaveEnabled(false);
+
+        return row;
+    }
+
+    private View getImageView(LayoutInflater inflater, String value) {
+        View row;
+        row = inflater.inflate(R.layout.partial_profile_edit_element_image, null);
+        ImageView imageView = (ImageView) row.findViewById(R.id.img_profile_edit_element);
+        imageView.setOnClickListener(new ImageClickListener(R.id.img_profile_edit_element));
+
+        if (value != null) {
+            imageView.setTag(R.string.tag_image_file_path, value);
+            try {
+                File srcFile = new File(value);
+                FileInputStream fis = new FileInputStream(srcFile);
+                Bitmap bm = BitmapFactory.decodeStream(fis);
+                imageView.setImageBitmap(bm);
+            } catch (FileNotFoundException e) {
+                Log.d("IMAGE ERROR", e.toString());
+                e.printStackTrace();
+            }
+        }
+        return row;
+    }
+
+    private View getDateView(LayoutInflater inflater, String value) {
+        View row;
+        row = inflater.inflate(R.layout.partial_profile_edit_element_date, null);
+        final EditText editText = (EditText) row.findViewById(R.id.txt_profile_edit_element);
+        if (value != null) {
+            editText.setText(value);
+        }
+        editText.setSaveEnabled(false);
+        editText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DatePickerDialog.OnDateSetListener DateSetListener = new DatePickerDialog.OnDateSetListener() {
+                    public void onDateSet(android.widget.DatePicker datePicker, int year,
+                                          int monthOfYear, int dayOfMonth) {
+                        editText.setText("" + year + "/" + (monthOfYear + 1) + "/" + dayOfMonth);
+                    }
+                };
+
+                // 日付情報の初期設定
+                Calendar calendar = Calendar.getInstance();
+                try {
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+                    dateFormat.setLenient(false);
+                    java.util.Date date = dateFormat.parse(editText.getText().toString());
+                    calendar.setTime(date);
+                } catch (ParseException e) {
+                }
+
+                DatePickerDialog dialog = new DatePickerDialog(
+                        getActivity(),
+                        android.R.style.Theme_Light,
+                        DateSetListener,
+                        calendar.get(Calendar.YEAR),
+                        calendar.get(Calendar.MONTH),
+                        calendar.get(Calendar.DAY_OF_MONTH)
+                );
+                dialog.show();
+            }
+        });
+        return row;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        Log.d("DEBUG", "onSaveInstanceState called.");
+
+        LinearLayout containerView = (LinearLayout) getActivity().findViewById(R.id.container_profile_edit);
+
+        ArrayList<ProfileParcelable> contents = new ArrayList<ProfileParcelable>();
+
+        int childCount = containerView.getChildCount();
+        for (int i = 0; i < childCount; i++) {
+            View row = containerView.getChildAt(i);
+
+            if (row.getTag(R.string.tag_key_id) == null) {
+                continue;
+            }
+
+            String key_id = (String) row.getTag(R.string.tag_key_id);
+            int sequence = (Integer) row.getTag(R.string.tag_key_sequence);
+            int value_type = (Integer) row.getTag(R.string.tag_key_type);
+
+            TextView label = (TextView) row.findViewById(R.id.lbl_profile_edit_element);
+            String label_str = label.getText().toString();
+
+            String value = getValue(row, value_type);
+
+            ProfileParcelable content = new ProfileParcelable(key_id, sequence, value, value_type, label_str);
+            contents.add(content);
+
+            Log.d("save", content.toString());
+        }
+        outState.putParcelableArrayList(KEY_EDIT_DATA, contents );
+
+    }
+
+    private String getValue(View container, int value_type) {
+        String value = null;
+        switch (value_type) {
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+                //
+                EditText textEdit = (EditText) container.findViewById(R.id.txt_profile_edit_element);
+                value = textEdit.getText().toString();
+                break;
+            case 5:
+                //
+                break;
+            case 6:
+                //
+                EditText dateEdit = (EditText) container.findViewById(R.id.txt_profile_edit_element);
+                value = dateEdit.getText().toString();
+                break;
+            case 7:
+
+                ImageView imageView = (ImageView) container.findViewById(R.id.img_profile_edit_element);
+                value = (String) imageView.getTag(R.string.tag_image_file_path);
+                break;
+        }
+        return value;
     }
 
 }
