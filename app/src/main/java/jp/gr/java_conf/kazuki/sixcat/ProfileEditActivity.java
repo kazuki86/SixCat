@@ -31,7 +31,7 @@ public class ProfileEditActivity extends ActionBarActivity {
 
     public static final String KEY_EDIT_DATA = "key_edit_data";
 
-    private long profile_id;
+    private String profile_id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,11 +39,10 @@ public class ProfileEditActivity extends ActionBarActivity {
         setContentView(R.layout.activity_profile_edit);
         if (savedInstanceState == null) {
 
-            String str_id = getIntent().getStringExtra(PlaceholderFragment.ARG_ITEM_ID);
-            profile_id = Long.valueOf(str_id);
+            profile_id = getIntent().getStringExtra(PlaceholderFragment.ARG_ITEM_ID);
 
             Bundle arguments = new Bundle();
-            arguments.putString(PlaceholderFragment.ARG_ITEM_ID, str_id);
+            arguments.putString(PlaceholderFragment.ARG_ITEM_ID, profile_id);
             PlaceholderFragment fragment = new PlaceholderFragment();
             fragment.setArguments(arguments);
 
@@ -80,10 +79,10 @@ public class ProfileEditActivity extends ActionBarActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_profile_edit_save) {
 
-            boolean result = save();
+            boolean result = save(profile_id);
             if (result) {
                 Intent detailIntent = new Intent(this, ProfileDetailActivity.class);
-                detailIntent.putExtra(ProfileDetailFragment.ARG_ITEM_ID, Long.toString(profile_id));
+                detailIntent.putExtra(ProfileDetailFragment.ARG_ITEM_ID, profile_id);
                 startActivity(detailIntent);
             } else {
                 showDialog("Error", "保存に失敗しました。");
@@ -98,7 +97,7 @@ public class ProfileEditActivity extends ActionBarActivity {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
 //                    ProfileEditActivity.this.setResult(Activity.RESULT_OK);
-                    boolean result = delete();
+                    boolean result = delete(profile_id);
                     if (result) {
                         Intent listIntent = new Intent(ProfileEditActivity.this, ProfileListActivity.class);
                         startActivity(listIntent);
@@ -125,33 +124,24 @@ public class ProfileEditActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-//    @Override
-//    public void onSaveInstanceState(Bundle outState) {
-//        super.onSaveInstanceState(outState);
-//
-//        PlaceholderFragment fragment = (PlaceholderFragment) getSupportFragmentManager().findFragmentById(R.id.container);
-//        if (fragment == null) return;
-//
-//        ArrayList<String> state = fragment.getInstanceState();
-//
-//        outState.putStringArrayList(KEY_EDIT_DATA, state);
-//    }
-//
-//    @Override
-//    protected void onRestoreInstanceState(Bundle inState) {
-//        super.onRestoreInstanceState(inState);
-//        PlaceholderFragment fragment = (PlaceholderFragment) getSupportFragmentManager().findFragmentById(R.id.container);
-//        if (fragment == null) return;
-//        ArrayList<String> state = inState.getStringArrayList(KEY_EDIT_DATA);
-//        fragment.loadInstanceState(state);
-//    }
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(PlaceholderFragment.ARG_ITEM_ID, profile_id);
+    }
 
-    private boolean delete() {
+    @Override
+    protected void onRestoreInstanceState(Bundle inState) {
+        super.onRestoreInstanceState(inState);
+        profile_id = inState.getString(PlaceholderFragment.ARG_ITEM_ID);
+    }
+
+    private boolean delete(String profile_id) {
         try {
             db.beginTransaction();
 
-            db.delete("profile_hd", "_id = ?", new String[]{Long.toString(profile_id)});
-            db.delete("profile_detail", "profile_id = ?", new String[]{Long.toString(profile_id)});
+            db.delete("profile_hd", "_id = ?", new String[]{profile_id});
+            db.delete("profile_detail", "profile_id = ?", new String[]{profile_id});
 
             db.setTransactionSuccessful();
             db.endTransaction();
@@ -163,7 +153,7 @@ public class ProfileEditActivity extends ActionBarActivity {
 
     }
 
-    private boolean save() {
+    private boolean save(String profile_id) {
         try {
             db.beginTransaction();
 
@@ -180,7 +170,7 @@ public class ProfileEditActivity extends ActionBarActivity {
                 values.add(new ProfileDetail(Long.valueOf(key_id), sequence, value));
             }
 
-            db.delete("profile_detail", "profile_id = ?", new String[]{Long.toString(profile_id)});
+            db.delete("profile_detail", "profile_id = ?", new String[]{profile_id});
             for (ProfileDetail value : values) {
                 ContentValues profileDetail = new ContentValues();
                 profileDetail.put("profile_id", profile_id);
@@ -305,7 +295,7 @@ public class ProfileEditActivity extends ActionBarActivity {
                     new String[]{profile_id, "1"},
                     null,
                     null,
-                    "sort_order desc"
+                    "sort_order"
             );
         }
     }
