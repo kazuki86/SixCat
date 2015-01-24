@@ -407,11 +407,37 @@ public abstract class AbstractProfileEditFragment extends Fragment {
             contents.add(content);
 
             Log.d("save", content.toString());
+
+            releaseResource(row, value_type);
         }
         outState.putParcelableArrayList(KEY_EDIT_DATA, contents );
 
     }
 
+    @Override
+    public void onPause(){
+        super.onPause();
+
+        LinearLayout containerView = (LinearLayout) getActivity().findViewById(R.id.container_profile_edit);
+
+        int childCount = containerView.getChildCount();
+        for (int i = 0; i < childCount; i++) {
+            View row = containerView.getChildAt(i);
+            if (row.getTag(R.string.tag_key_id) == null) {
+                continue;
+            }
+            int value_type = (Integer) row.getTag(R.string.tag_key_type);
+            releaseResource(row, value_type);
+        }
+    }
+    private void releaseResource(View container, int value_type) {
+        if (value_type == 7) {
+            //Image
+            ImageView imageView = (ImageView) container.findViewById(R.id.img_profile_edit_element);
+            imageView.setImageDrawable(null);
+            Log.d("memory leak check", "a");
+        }
+    }
     private String getValue(View container, int value_type) {
         String value = null;
         switch (value_type) {

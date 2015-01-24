@@ -17,7 +17,6 @@ import java.io.InputStream;
  */
 public class ImageUtility {
 
-
     static int maxSize = 100;
     public static void loadImage(ContentResolver resolver, ImageView imageView, File srcFile) {
         InputStream inputStream = null;
