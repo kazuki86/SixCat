@@ -177,7 +177,7 @@ public class ProfileEditActivity extends ActionBarActivity {
                 Integer value_type = (Integer) child.getTag(R.string.tag_key_type);
                 if (key_id == null || sequence == null) continue;
                 String value = getInputValue(child, value_type);
-                if (value == null) continue;
+                if (value == null || value.isEmpty()) continue;
                 values.add(new ProfileDetail(Long.valueOf(key_id), sequence, value));
             }
 
@@ -299,10 +299,9 @@ public class ProfileEditActivity extends ActionBarActivity {
         }
 
         private Cursor getProfileKeyMasterWithExistValueCursor(String profile_id) {
-            return db.query("view_profile_detail",
+            return db.query("view_profile_edit",
                     null,
-                    //本来profile_idはview定義中のleft join のon句に指定するべきだが仕方なく。
-                    "(profile_id = ? or profile_id is NULL) and use_flg = ?",
+                    "profile_hd_id = ?  and use_flg = ?",
                     new String[]{profile_id, "1"},
                     null,
                     null,

@@ -10,7 +10,7 @@ import android.util.Log;
  */
 public class SixCatSQLiteOpenHelper  extends SQLiteOpenHelper {
 
-    static final int VERSION = 20;
+    static final int VERSION = 22;
 
     public SixCatSQLiteOpenHelper(Context context) {
         super(context, "six_cat", null, VERSION);
@@ -88,6 +88,19 @@ public class SixCatSQLiteOpenHelper  extends SQLiteOpenHelper {
                 + "   profile_key_master ms"
                 + "   left join profile_detail dt on ms._id = dt.key_id;";
 
+        String create_sql_view_profile_edit
+                = " create view view_profile_edit as select "
+                + "   ms.*, "
+                + "   hd._id as profile_hd_id, "
+                + "   dt.* "
+                + " from"
+                + "   profile_key_master ms,"
+                + "   profile_hd hd "
+                + "   left join profile_detail dt "
+                + "     on ms._id = dt.key_id "
+                + "     and hd._id = dt.profile_id ;";
+
+        Log.d("SQL", create_sql_view_profile_edit);
         String[] insert_sql_value_type_master_list = new String[]{
                 "insert into value_type_master values( 1, '数値'); ",
                 "insert into value_type_master values( 2, '単一行テキスト'); ",
@@ -126,6 +139,7 @@ public class SixCatSQLiteOpenHelper  extends SQLiteOpenHelper {
         db.execSQL(create_sql_profile_detail);
         db.execSQL(create_sql_view_profile_list);
         db.execSQL(create_sql_view_profile_detail);
+        db.execSQL(create_sql_view_profile_edit);
 
         for(String sql : insert_sql_value_type_master_list) {
             db.execSQL(sql);
@@ -148,6 +162,7 @@ public class SixCatSQLiteOpenHelper  extends SQLiteOpenHelper {
         String drop_sql_profile_detail      = "drop table profile_detail;";
         String drop_sql_view_profile_list   = "drop view view_profile_list;";
         String drop_sql_view_profile_detail   = "drop view view_profile_detail;";
+        String drop_sql_view_profile_edit   = "drop view view_profile_edit;";
 
         try {
             db.execSQL(drop_sql_value_type_master);
@@ -156,6 +171,7 @@ public class SixCatSQLiteOpenHelper  extends SQLiteOpenHelper {
             db.execSQL(drop_sql_profile_detail);
             db.execSQL(drop_sql_view_profile_list);
             db.execSQL(drop_sql_view_profile_detail);
+            db.execSQL(drop_sql_view_profile_edit);
         } catch(Exception e){
 
             Log.d("DB",e.toString());

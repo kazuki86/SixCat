@@ -113,7 +113,7 @@ public class ProfileRegisterActivity extends ActionBarActivity {
                 Integer value_type = (Integer)child.getTag(R.string.tag_key_type);
                 if (key_id == null || sequence == null) continue;
                 String value = getInputValue(child, value_type);
-                if (value == null) continue;
+                if (value == null || value.isEmpty()) continue;
                 values.add(new ProfileDetail(Long.valueOf(key_id), sequence, value));
             }
 
