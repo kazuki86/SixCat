@@ -344,7 +344,8 @@ public abstract class AbstractProfileEditFragment extends Fragment {
                 DatePickerDialog.OnDateSetListener DateSetListener = new DatePickerDialog.OnDateSetListener() {
                     public void onDateSet(android.widget.DatePicker datePicker, int year,
                                           int monthOfYear, int dayOfMonth) {
-                        editText.setText("" + year + "/" + (monthOfYear + 1) + "/" + dayOfMonth);
+                        String dateStr = String.format("%4d/%02d/%02d",year, (monthOfYear + 1), dayOfMonth);
+                        editText.setText(dateStr);
                     }
                 };
 
