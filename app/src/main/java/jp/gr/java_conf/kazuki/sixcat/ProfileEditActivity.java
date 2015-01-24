@@ -2,6 +2,8 @@ package jp.gr.java_conf.kazuki.sixcat;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.FragmentManager;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -9,6 +11,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -31,7 +34,7 @@ public class ProfileEditActivity extends ActionBarActivity {
 
     public static final String KEY_EDIT_DATA = "key_edit_data";
 
-    private String profile_id;
+    public String profile_id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,30 +93,9 @@ public class ProfileEditActivity extends ActionBarActivity {
             return true;
         } else if (id == R.id.action_profile_edit_delete) {
 
-            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-            dialog.setTitle("Confirm");
-            dialog.setMessage("本当に削除しますか？");
-            dialog.setPositiveButton("YES", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-//                    ProfileEditActivity.this.setResult(Activity.RESULT_OK);
-                    boolean result = delete(profile_id);
-                    if (result) {
-                        Intent listIntent = new Intent(ProfileEditActivity.this, ProfileListActivity.class);
-                        startActivity(listIntent);
-                    } else {
-                        showDialog("Error", "削除に失敗しました。");
-                    }
-                }
-            });
-            dialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-//                    ProfileEditActivity.this.setResult(Activity.RESULT_OK);
-                }
-            });
-            dialog.create();
-            dialog.show();
+            ConfirmDeletingDialog confirmDialog = new ConfirmDeletingDialog();
+            confirmDialog.show(getSupportFragmentManager(),"dialog");
+
             return true;
         } else if (id == R.id.action_profile_edit_cancel) {
             //戻る
@@ -124,7 +106,36 @@ public class ProfileEditActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
+    public static class ConfirmDeletingDialog extends DialogFragment {
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+
+            final ProfileEditActivity activity = (ProfileEditActivity)getActivity();
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setTitle("Confirmation");
+            builder.setMessage("本当に削除しますか？");
+            builder.setPositiveButton("はい", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    boolean result = activity.delete(activity.profile_id);
+                    if (result) {
+                        Intent listIntent = new Intent(activity, ProfileListActivity.class);
+                        startActivity(listIntent);
+                    } else {
+                        activity.showDialog("Error", "削除に失敗しました。");
+                    }
+                }
+            });
+            builder.setNegativeButton("いいえ", null);
+            AlertDialog dialog = builder.create();
+            return dialog;
+        }
+    }
+
+
+
+        @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putString(PlaceholderFragment.ARG_ITEM_ID, profile_id);
