@@ -40,6 +40,8 @@ public class ProfileListActivity extends ActionBarActivity
 
     private String current_item_id = null;
 
+    private static String ARG_ITEM_ID = "item_id";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -173,6 +175,18 @@ public class ProfileListActivity extends ActionBarActivity
             }
         }
         return false;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(ARG_ITEM_ID, current_item_id);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle inState) {
+        super.onRestoreInstanceState(inState);
+        current_item_id = inState.getString(ARG_ITEM_ID);
     }
 
 
