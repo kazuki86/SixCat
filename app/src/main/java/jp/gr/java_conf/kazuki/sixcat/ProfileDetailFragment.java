@@ -1,9 +1,11 @@
 package jp.gr.java_conf.kazuki.sixcat;
 
+import android.content.ContentResolver;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -17,6 +19,8 @@ import android.widget.TextView;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 
 import jp.gr.java_conf.kazuki.sixcat.data.SixCatSQLiteOpenHelper;
 
@@ -126,15 +130,13 @@ public class ProfileDetailFragment extends Fragment {
 
                         if (value != null) {
                             imageView.setTag(R.string.tag_image_file_path,value);
-                            try {
-                                File srcFile = new File(value);
-                                FileInputStream fis = new FileInputStream(srcFile);
-                                Bitmap bm = BitmapFactory.decodeStream(fis);
-                                imageView.setImageBitmap(bm);
-                            } catch (FileNotFoundException e) {
-                                Log.d("IMAGE ERROR",e.toString());
-                                e.printStackTrace();
-                            }
+                            ContentResolver resolver = getActivity().getContentResolver();
+                            File srcFile = new File(value);
+                            ImageUtility.loadImage(resolver, imageView, srcFile);
+
+//                                FileInputStream fis = new FileInputStream(srcFile);
+//                                Bitmap bm = BitmapFactory.decodeStream(fis);
+//                                imageView.setImageBitmap(bm);
                         }
                         break;
                 }
@@ -148,5 +150,6 @@ public class ProfileDetailFragment extends Fragment {
 
         return rootView;
     }
+
 
 }

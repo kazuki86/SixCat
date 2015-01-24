@@ -311,7 +311,7 @@ public class ProfileEditActivity extends ActionBarActivity {
         }
     }
 
-    class ProfileDetail {
+    static class ProfileDetail {
         public long key_id;
         public int sequence;
         public String value;

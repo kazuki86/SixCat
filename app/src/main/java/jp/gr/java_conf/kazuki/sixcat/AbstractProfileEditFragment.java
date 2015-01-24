@@ -317,15 +317,18 @@ public abstract class AbstractProfileEditFragment extends Fragment {
 
         if (value != null) {
             imageView.setTag(R.string.tag_image_file_path, value);
-            try {
-                File srcFile = new File(value);
-                FileInputStream fis = new FileInputStream(srcFile);
-                Bitmap bm = BitmapFactory.decodeStream(fis);
-                imageView.setImageBitmap(bm);
-            } catch (FileNotFoundException e) {
-                Log.d("IMAGE ERROR", e.toString());
-                e.printStackTrace();
-            }
+            File srcFile = new File(value);
+            ContentResolver resolver = getActivity().getContentResolver();
+            ImageUtility.loadImage(resolver,imageView, srcFile);
+
+//            try {
+//                FileInputStream fis = new FileInputStream(srcFile);
+//                Bitmap bm = BitmapFactory.decodeStream(fis);
+//                imageView.setImageBitmap(bm);
+//            } catch (FileNotFoundException e) {
+//                Log.d("IMAGE ERROR", e.toString());
+//                e.printStackTrace();
+//            }
         }
         return row;
     }
