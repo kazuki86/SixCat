@@ -3,9 +3,6 @@ package jp.gr.java_conf.kazuki.sixcat;
 import android.content.ContentResolver;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -17,10 +14,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
 
 import jp.gr.java_conf.kazuki.sixcat.data.SixCatSQLiteOpenHelper;
 
@@ -36,8 +29,6 @@ public class ProfileDetailFragment extends Fragment {
      * represents.
      */
     public static final String ARG_ITEM_ID = "item_id";
-
-    private SQLiteDatabase db;
 
     private Cursor cursor;
 
@@ -65,7 +56,7 @@ public class ProfileDetailFragment extends Fragment {
 //            long id = Long.getLong(getArguments().getString(ARG_ITEM_ID));
             SixCatSQLiteOpenHelper helper = new SixCatSQLiteOpenHelper(getActivity());
 
-            db = helper.getReadableDatabase();
+            SQLiteDatabase db = helper.getReadableDatabase();
             //sample
 //            cursor = db.query("view_profile_list",
 //                    new String[]{"_id","status","name","kana","nickname","birthday"},
@@ -96,7 +87,7 @@ public class ProfileDetailFragment extends Fragment {
 
             while(cursor.moveToNext()){
 
-                String key_id = cursor.getString(cursor.getColumnIndex("_id"));
+//                String key_id = cursor.getString(cursor.getColumnIndex("_id"));
                 String value =  cursor.getString(cursor.getColumnIndex("value"));
                 String sequence_str =  cursor.getString(cursor.getColumnIndex("sequence"));
                 int sequence = (sequence_str == null) ? 1 : Integer.valueOf(sequence_str);
@@ -109,7 +100,7 @@ public class ProfileDetailFragment extends Fragment {
 
 
                 View row = null;
-                int content_view_id = R.id.txt_profile_edit_element;
+//                int content_view_id = R.id.txt_profile_edit_element;
                 // 1:数値、2:単一行テキスト、3:複数行テキスト、4:英数字、5:選択、6:日付、7:画像
                 switch(value_type) {
                     case 1:
@@ -140,10 +131,11 @@ public class ProfileDetailFragment extends Fragment {
                         }
                         break;
                 }
-                TextView label = (TextView) row.findViewById(R.id.lbl_profile_detail_element);
-                label.setText(label_str);
-
-                containerView.addView(row);
+                if (row != null) {
+                    TextView label = (TextView) row.findViewById(R.id.lbl_profile_detail_element);
+                    label.setText(label_str);
+                    containerView.addView(row);
+                }
             }
 
         }

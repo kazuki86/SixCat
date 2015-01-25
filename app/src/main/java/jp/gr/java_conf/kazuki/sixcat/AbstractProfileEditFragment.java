@@ -1,16 +1,15 @@
 package jp.gr.java_conf.kazuki.sixcat;
 
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Intent;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.MediaStore;
 import android.provider.MediaStore.Images;
 import android.provider.MediaStore.Images.Media;
 import android.support.v4.app.Fragment;
@@ -24,8 +23,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,22 +30,23 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Set;
 
 import jp.gr.java_conf.kazuki.sixcat.data.SixCatSQLiteOpenHelper;
 
 /**
+ * AbstractProfileEditFragment
+ *
  * Created by kazuki on 2015/01/03.
  */
 public abstract class AbstractProfileEditFragment extends Fragment {
 
     public static final String ARG_ITEM_ID = "item_id";
-    public static final String KEY_BUILT_EDIT_FLG = "key_built_edit_flg";
+//    public static final String KEY_BUILT_EDIT_FLG = "key_built_edit_flg";
     public static final String KEY_EDIT_DATA = "key_edit_data";
 
     final int REQUEST_ACTION_PICK = 1;
 
-    public static final int TAG_IMG_FILE_NAME = 1;
+//    public static final int TAG_IMG_FILE_NAME = 1;
 
     public static final String imageDirectoryName = AbstractProfileEditFragment.class.getPackage().getName() + "/image/";
 
@@ -56,7 +54,7 @@ public abstract class AbstractProfileEditFragment extends Fragment {
 
     protected SQLiteDatabase db;
 
-    protected boolean already_built_edit_flg = false;
+//    protected boolean already_built_edit_flg = false;
 
     public AbstractProfileEditFragment() {
     }
@@ -143,7 +141,7 @@ public abstract class AbstractProfileEditFragment extends Fragment {
     abstract protected void initializeView(LayoutInflater inflater, View rootView, Bundle savedInstanceState);
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(resultCode == getActivity().RESULT_OK){
+        if(resultCode == Activity.RESULT_OK){
             if(requestCode == REQUEST_ACTION_PICK){
                 try {
                     InputStream iStream = getActivity().getApplicationContext().getContentResolver().openInputStream(data.getData());
@@ -164,7 +162,9 @@ public abstract class AbstractProfileEditFragment extends Fragment {
 //                    EditText editText = (EditText)getActivity().findViewById(R.id.txt_profile_edit_portrait);
 //                    editText.setText(imageFileName);
 
-                }catch (IOException e) {}
+                }catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
@@ -174,8 +174,8 @@ public abstract class AbstractProfileEditFragment extends Fragment {
      * 新規フォルダを作成し、画像ファイルを保存する
      * 参考：http://d.hatena.ne.jp/acid-panda/20110420/1303316310
      *
-     * @param imageToSave
-     * @param fileName
+     * @param imageToSave 保存対象のBitmap画像
+     * @param fileName 保存先
      */
     private void createFolderSaveImage(Bitmap imageToSave, String fileName) {
 
@@ -188,19 +188,26 @@ public abstract class AbstractProfileEditFragment extends Fragment {
         File folder = new File(folderPath);
         if (!folder.exists()) {
             Log.d("debug_kazuki", "mkdirs calling");
-            folder.mkdirs();
+            if (!folder.mkdirs()) {
+                throw new RuntimeException("cannot make a directory [" + folderPath + "]");
+            }
         }
 
         if (imageFileName != null) {
             //前回選択した画像は不要なので削除
             File old_file = new File(folder,imageFileName );
             if (old_file.exists()) {
-                old_file.delete();
+                if (!old_file.delete()) {
+                    Log.w("", "cannot delete file [" + imageFileName + "]");
+                }
             }
         }
         File file = new File(folder, fileName);
         if (file.exists()) {
-            file.delete();
+            if (!file.delete()){
+                throw new RuntimeException("cannot delete file [" + fileName + "]");
+
+            }
         }
 
         try {
@@ -227,7 +234,7 @@ public abstract class AbstractProfileEditFragment extends Fragment {
     /**
      * ContentProviderに新しいイメージファイルが作られたことを通知する
      * 参考：http://d.hatena.ne.jp/acid-panda/20110420/1303316310
-     * @param path
+     * @param path ファイルパス
      * @throws Exception
      */
     private void showFolder(File path) throws Exception {
@@ -243,6 +250,7 @@ public abstract class AbstractProfileEditFragment extends Fragment {
             values.put(Images.Media.DATA, path.getPath());
             contentResolver.insert(Media.EXTERNAL_CONTENT_URI, values);
         } catch (Exception e) {
+            e.printStackTrace();
             throw e;
         }
     }
@@ -280,6 +288,9 @@ public abstract class AbstractProfileEditFragment extends Fragment {
                 row = getImageView(inflater, profile.value);
                 content_view_id = R.id.img_profile_edit_element;
                 break;
+        }
+        if (row == null) {
+            throw new RuntimeException("cannot make row view");
         }
         row.setTag(R.string.tag_key_id, profile.key_id);
         row.setTag(R.string.tag_key_sequence, profile.sequence);
@@ -360,6 +371,7 @@ public abstract class AbstractProfileEditFragment extends Fragment {
                     java.util.Date date = dateFormat.parse(editText.getText().toString());
                     calendar.setTime(date);
                 } catch (ParseException e) {
+                    e.printStackTrace();
                 }
 
                 DatePickerDialog dialog = new DatePickerDialog(
@@ -384,7 +396,7 @@ public abstract class AbstractProfileEditFragment extends Fragment {
 
         LinearLayout containerView = (LinearLayout) getActivity().findViewById(R.id.container_profile_edit);
 
-        ArrayList<ProfileParcelable> contents = new ArrayList<ProfileParcelable>();
+        ArrayList<ProfileParcelable> contents = new ArrayList<>();
 
         int childCount = containerView.getChildCount();
         for (int i = 0; i < childCount; i++) {

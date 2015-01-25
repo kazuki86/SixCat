@@ -2,36 +2,22 @@ package jp.gr.java_conf.kazuki.sixcat;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.DatePickerDialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.ActionBar;
-import android.support.v4.app.Fragment;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.os.Build;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 import jp.gr.java_conf.kazuki.sixcat.data.SixCatSQLiteOpenHelper;
@@ -74,7 +60,7 @@ public class ProfileRegisterActivity extends ActionBarActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_profile_register_save) {
 
-            PlaceholderFragment fragment = (PlaceholderFragment)getSupportFragmentManager().findFragmentById(R.id.container);
+//            PlaceholderFragment fragment = (PlaceholderFragment)getSupportFragmentManager().findFragmentById(R.id.container);
 //            EditText edit_name= (EditText)fragment.getView().findViewById(R.id.et_profile_edit_name);
 //            showDialog("save result", "name:" + edit_name.getText().toString());
             long profile_id = save();
@@ -96,14 +82,14 @@ public class ProfileRegisterActivity extends ActionBarActivity {
     }
 
     private long save(){
-        long id = -1;
+        long id;
         try {
             db.beginTransaction();
             ContentValues profileHd = new ContentValues();
             profileHd.put("status", 0);
             id = db.insert("profile_hd", null, profileHd);
 
-            List<ProfileDetail> values = new ArrayList<ProfileDetail>();
+            List<ProfileDetail> values = new ArrayList<>();
 
             LinearLayout containerView = (LinearLayout)getView(R.id.container_profile_edit);
             for(int i=0; i<containerView.getChildCount(); i++) {
@@ -159,8 +145,12 @@ public class ProfileRegisterActivity extends ActionBarActivity {
 
     private View getView(int id) {
         PlaceholderFragment fragment = (PlaceholderFragment)getSupportFragmentManager().findFragmentById(R.id.container);
+        if (fragment == null || fragment.getView() == null) {
+            return null;
+        }
         return fragment.getView().findViewById(id);
     }
+
     private void showDialog(String title, String text){
 
         AlertDialog.Builder dialog = new AlertDialog.Builder(this);

@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -120,7 +121,7 @@ public class ProfileListActivity extends ActionBarActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        Intent intent = null;
+        Intent intent;
         switch(id) {
             case R.id.menu_profile_list_profile_register:
                 //showDialog("menu_profile_list_profile_register");
@@ -184,7 +185,7 @@ public class ProfileListActivity extends ActionBarActivity
     }
 
     @Override
-    protected void onRestoreInstanceState(Bundle inState) {
+    protected void onRestoreInstanceState(@NonNull Bundle inState) {
         super.onRestoreInstanceState(inState);
         current_item_id = inState.getString(ARG_ITEM_ID);
     }

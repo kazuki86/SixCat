@@ -3,7 +3,6 @@ package jp.gr.java_conf.kazuki.sixcat;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.FragmentManager;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -11,6 +10,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -32,7 +32,7 @@ public class ProfileEditActivity extends ActionBarActivity {
 
     private SQLiteDatabase db;
 
-    public static final String KEY_EDIT_DATA = "key_edit_data";
+//    public static final String KEY_EDIT_DATA = "key_edit_data";
 
     public String profile_id;
 
@@ -76,7 +76,7 @@ public class ProfileEditActivity extends ActionBarActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        PlaceholderFragment fragment = (PlaceholderFragment) getSupportFragmentManager().findFragmentById(R.id.container);
+//        PlaceholderFragment fragment = (PlaceholderFragment) getSupportFragmentManager().findFragmentById(R.id.container);
 //        EditText edit_name= (EditText)fragment.getView().findViewById(R.id.et_profile_edit_name);
 
         //noinspection SimplifiableIfStatement
@@ -108,6 +108,7 @@ public class ProfileEditActivity extends ActionBarActivity {
 
     public static class ConfirmDeletingDialog extends DialogFragment {
 
+        @NonNull
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
 
@@ -128,8 +129,7 @@ public class ProfileEditActivity extends ActionBarActivity {
                 }
             });
             builder.setNegativeButton("いいえ", null);
-            AlertDialog dialog = builder.create();
-            return dialog;
+            return builder.create();
         }
     }
 
@@ -142,7 +142,7 @@ public class ProfileEditActivity extends ActionBarActivity {
     }
 
     @Override
-    protected void onRestoreInstanceState(Bundle inState) {
+    protected void onRestoreInstanceState(@NonNull Bundle inState) {
         super.onRestoreInstanceState(inState);
         profile_id = inState.getString(PlaceholderFragment.ARG_ITEM_ID);
     }
@@ -168,7 +168,7 @@ public class ProfileEditActivity extends ActionBarActivity {
         try {
             db.beginTransaction();
 
-            List<ProfileDetail> values = new ArrayList<ProfileDetail>();
+            List<ProfileDetail> values = new ArrayList<>();
             LinearLayout containerView = (LinearLayout) getView(R.id.container_profile_edit);
             for (int i = 0; i < containerView.getChildCount(); i++) {
                 View child = containerView.getChildAt(i);
@@ -225,6 +225,9 @@ public class ProfileEditActivity extends ActionBarActivity {
 
     private View getView(int id) {
         PlaceholderFragment fragment = (PlaceholderFragment) getSupportFragmentManager().findFragmentById(R.id.container);
+        if (fragment == null) {
+            return null;
+        }
         return fragment.getView().findViewById(id);
     }
 

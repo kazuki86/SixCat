@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
+ * ImageUtility
+ * 画像の取得に関するUtilityクラス
  * Created by kazuki on 2015/01/24.
  */
 public class ImageUtility {

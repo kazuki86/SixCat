@@ -41,8 +41,6 @@ public class ProfileListFragment extends ListFragment {
     private int mActivatedPosition = ListView.INVALID_POSITION;
 
 
-    private SQLiteDatabase db;
-
     /**
      * A callback interface that all activities containing this fragment must
      * implement. This mechanism allows activities to be notified of item
@@ -77,9 +75,10 @@ public class ProfileListFragment extends ListFragment {
         super.onCreate(savedInstanceState);
 
         SixCatSQLiteOpenHelper helper = new SixCatSQLiteOpenHelper(getActivity());
-        db = helper.getReadableDatabase();
+        SQLiteDatabase db = helper.getReadableDatabase();
         Cursor cursor = db.query("view_profile_list",null,null,null,null,null,"_id desc");
 
+        @SuppressWarnings("deprecation")
         ListAdapter adapter = new SimpleCursorAdapter(getActivity(),
                 R.layout.partial_profile_list_element,
                 cursor,

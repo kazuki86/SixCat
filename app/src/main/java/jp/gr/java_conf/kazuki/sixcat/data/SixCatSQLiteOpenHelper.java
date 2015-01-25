@@ -6,6 +6,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 /**
+ * SixCatSQLiteOpenHelper
+ *
  * Created by kazuki on 2015/01/02.
  */
 public class SixCatSQLiteOpenHelper  extends SQLiteOpenHelper {

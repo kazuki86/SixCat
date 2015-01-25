@@ -4,6 +4,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 /**
+ * ProfileParcelable
+ * プロフィール項目を保持し、save & restoreに使える形式
  * Created by kazuki on 2015/01/22.
  */
 public class ProfileParcelable implements Parcelable {
