@@ -3,16 +3,12 @@ package jp.gr.java_conf.kazuki.sixcat;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.MediaStore.Images;
-import android.provider.MediaStore.Images.Media;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -25,8 +21,6 @@ import android.widget.TextView;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -49,7 +43,7 @@ public abstract class AbstractProfileEditFragment extends Fragment {
 
 //    public static final int TAG_IMG_FILE_NAME = 1;
 
-    public static final String imageDirectoryName = AbstractProfileEditFragment.class.getPackage().getName() + "/image/";
+    public static final String imageDirectoryName = AbstractProfileEditFragment.class.getPackage().getName() + "/.image/";
 
     private String imageFileName;
 
@@ -228,42 +222,12 @@ public abstract class AbstractProfileEditFragment extends Fragment {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        try {
-            // これをしないと、新規フォルダは端末をシャットダウンするまで更新されない
-            Log.d("debug_kazuki", "showFolder calling");
-            showFolder(file);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * ContentProviderに新しいイメージファイルが作られたことを通知する
-     * 参考：http://d.hatena.ne.jp/acid-panda/20110420/1303316310
-     * @param path ファイルパス
-     * @throws Exception
-     */
-    private void showFolder(File path) throws Exception {
-        try {
-            ContentValues values = new ContentValues();
-            ContentResolver contentResolver = getActivity().getApplicationContext()
-                    .getContentResolver();
-            values.put(Images.Media.MIME_TYPE, "image/jpeg");
-            values.put(Images.Media.DATE_MODIFIED,
-                    System.currentTimeMillis() / 1000);
-            values.put(Images.Media.SIZE, path.length());
-            values.put(Images.Media.TITLE, path.getName());
-            values.put(Images.Media.DATA, path.getPath());
-            contentResolver.insert(Media.EXTERNAL_CONTENT_URI, values);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw e;
-        }
     }
 
     public static String getImageFileName(){
-        return "img_" + System.currentTimeMillis() + ".jpg";
+        //ファイル名の先頭をドットにするとデフォルトでは隠しファイルになる
+        //media scan時にもおそらくスキップされる。
+        return ".img_" + System.currentTimeMillis() + ".jpg";
     }
 
 

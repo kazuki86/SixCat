@@ -12,7 +12,7 @@ import android.util.Log;
  */
 public class SixCatSQLiteOpenHelper  extends SQLiteOpenHelper {
 
-    static final int VERSION = 22;
+    static final int VERSION = 23;
 
     public SixCatSQLiteOpenHelper(Context context) {
         super(context, "six_cat", null, VERSION);
