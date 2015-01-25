@@ -1,0 +1,21 @@
+create table profile_key_master( 
+  _id integer primary key autoincrement, 
+  name text not null, 
+  description text, 
+  sort_order integer not null default 0, 
+  plural_flg integer not null default 0, 
+  value_type_id integer not null, 
+  initial_value text, 
+  system_flg integer not null default 0, 
+  use_flg integer not null default 1, 
+  option0 text, 
+  option1 text, 
+  option2 text, 
+  option3 text, 
+  option4 text, 
+  option5 text, 
+  option6 text, 
+  option7 text, 
+  option8 text, 
+  option9 text 
+);

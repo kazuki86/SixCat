@@ -1,9 +1,18 @@
 package jp.gr.java_conf.kazuki.sixcat.data;
 
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * SixCatSQLiteOpenHelper
@@ -12,175 +21,132 @@ import android.util.Log;
  */
 public class SixCatSQLiteOpenHelper  extends SQLiteOpenHelper {
 
-    static final int VERSION = 23;
+    static final int VERSION        = 100000001;
+    static final int SUB_VERSION_MAX = 1000000;
+
+    static String assetsFileEncoding = "SJIS";
+    static String database_name = "six_cat";
+    private Context mContext;
 
     public SixCatSQLiteOpenHelper(Context context) {
-        super(context, "six_cat", null, VERSION);
+        super(context,database_name, null, VERSION);
+        mContext = context;
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        initializeDatabase(db);
-    }
-
-    private void initializeDatabase(SQLiteDatabase db){
-        String create_sql_value_type_master
-                = "create table value_type_master( "
-                + " _id integer primary key autoincrement, "
-                + " name text not null ); ";
-        String create_sql_profile_key_master
-                = "create table profile_key_master( "
-                + " _id integer primary key autoincrement, "
-                + " name text not null, "
-                + " description text, "
-                + " sort_order integer not null default 0, "
-                + " plural_flg integer not null default 0, "
-                + " value_type_id integer not null, " // 1:数値、2:単一行テキスト、3:複数行テキスト、4:英数字、5:選択、6:日付、7:画像
-                + " initial_value text, "
-                + " system_flg integer not null default 0, "
-                + " use_flg integer not null default 1, "
-                + " option0 text, "
-                + " option1 text, "
-                + " option2 text, "
-                + " option3 text, "
-                + " option4 text, "
-                + " option5 text, "
-                + " option6 text, "
-                + " option7 text, "
-                + " option8 text, "
-                + " option9 text ); ";
-        String create_sql_profile_hd
-                = "create table profile_hd( "
-                + " _id integer primary key autoincrement, "
-                + " status integer not null default 0 )";
-        String create_sql_profile_detail
-                = "create table profile_detail( "
-                + " _id integer primary key autoincrement, "
-                + " profile_id integer not null, "
-                + " key_id integer not null, "
-                + " sequence integer not null default 1, "
-                + " value text )";
-
-        String create_sql_view_profile_list
-                =  " create view view_profile_list as select "
-                + "   hd.*,"
-                + "   dt_name.value as name,"
-                + "   dt_kana.value as kana,"
-                + "   dt_nickname.value as nickname,"
-                + "   dt_birthday.value as birthday"
-                + " from "
-                + "   profile_hd hd"
-                + "   left join profile_detail dt_name "
-                + "     on  hd._id = dt_name.profile_id "
-                + "     and dt_name.key_id = 1"
-                + "   left join profile_detail dt_kana "
-                + "     on  hd._id = dt_kana.profile_id "
-                + "     and dt_kana.key_id = 2"
-                + "   left join profile_detail dt_nickname "
-                + "     on  hd._id = dt_nickname.profile_id "
-                + "     and dt_nickname.key_id = 3"
-                + "   left join profile_detail dt_birthday "
-                + "     on  hd._id = dt_birthday.profile_id "
-                + "     and dt_birthday.key_id = 4;";
-
-        String create_sql_view_profile_detail
-                = " create view view_profile_detail as select "
-                + "   *"
-                + " from"
-                + "   profile_key_master ms"
-                + "   left join profile_detail dt on ms._id = dt.key_id;";
-
-        String create_sql_view_profile_edit
-                = " create view view_profile_edit as select "
-                + "   ms.*, "
-                + "   hd._id as profile_hd_id, "
-                + "   dt.* "
-                + " from"
-                + "   profile_key_master ms,"
-                + "   profile_hd hd "
-                + "   left join profile_detail dt "
-                + "     on ms._id = dt.key_id "
-                + "     and hd._id = dt.profile_id ;";
-
-        Log.d("SQL", create_sql_view_profile_edit);
-        String[] insert_sql_value_type_master_list = new String[]{
-                "insert into value_type_master values( 1, '数値'); ",
-                "insert into value_type_master values( 2, '単一行テキスト'); ",
-                "insert into value_type_master values( 3, '複数行テキスト'); ",
-                "insert into value_type_master values( 4, '英数字'); ",
-                "insert into value_type_master values( 5, '選択'); ",
-                "insert into value_type_master values( 6, '日付'); ",
-                "insert into value_type_master values( 7, '画像'); ",
-        };
-        String[] insert_sql_profile_key_master_list = new String[]{
-                "insert into profile_key_master values ( 1,'名前'           ,'',2,0,2,'',0,1,null,null,null,null,null,null,null,null,null,null);",
-                "insert into profile_key_master values ( 2,'よみがな'       ,'',3,0,2,'',0,1,null,null,null,null,null,null,null,null,null,null);",
-                "insert into profile_key_master values ( 3,'ニックネーム'   ,'',4,0,2,'',0,1,null,null,null,null,null,null,null,null,null,null);",
-                "insert into profile_key_master values ( 4,'誕生日'         ,'',5,0,6,'',0,1,null,null,null,null,null,null,null,null,null,null);",
-                "insert into profile_key_master values ( 5,'写真'           ,'',1,0,7,'',0,1,null,null,null,null,null,null,null,null,null,null);",
-        };
-        String[] insert_sql_profile_list = new String[]{
-                "insert into profile_hd values ( 1, 0);",
-                "insert into profile_detail values ( 1, 1, 1, 1, '六猫　晶子');",
-                "insert into profile_detail values ( 2, 1, 2, 1, 'ろくねこ　しょうこ');",
-                "insert into profile_detail values ( 3, 1, 3, 1, 'しょうこ');",
-                "insert into profile_detail values ( 4, 1, 4, 1, '1980/02/03');",
-
-                "insert into profile_hd values ( 2, 0);",
-                "insert into profile_detail values ( 5, 2, 1, 1, '六猫　多喜子');",
-                "insert into profile_detail values ( 6, 2, 2, 1, 'ろくねこ　たきこ');",
-                "insert into profile_detail values ( 7, 2, 3, 1, 'たっきー');",
-                "insert into profile_detail values ( 8, 2, 4, 1, '1984/09/28');",
-
-        };
-
-
-        db.execSQL(create_sql_value_type_master);
-        db.execSQL(create_sql_profile_key_master);
-        db.execSQL(create_sql_profile_hd);
-        db.execSQL(create_sql_profile_detail);
-        db.execSQL(create_sql_view_profile_list);
-        db.execSQL(create_sql_view_profile_detail);
-        db.execSQL(create_sql_view_profile_edit);
-
-        for(String sql : insert_sql_value_type_master_list) {
-            db.execSQL(sql);
+        try {
+            execute(db);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        for(String sql : insert_sql_profile_key_master_list) {
-            db.execSQL(sql);
-        }
-        for(String sql : insert_sql_profile_list) {
-            db.execSQL(sql);
-        }
-
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
-        String drop_sql_value_type_master   = "drop table value_type_master;";
-        String drop_sql_profile_key_master  = "drop table profile_key_master;";
-        String drop_sql_profile_hd          = "drop table profile_hd;";
-        String drop_sql_profile_detail      = "drop table profile_detail;";
-        String drop_sql_view_profile_list   = "drop view view_profile_list;";
-        String drop_sql_view_profile_detail   = "drop view view_profile_detail;";
-        String drop_sql_view_profile_edit   = "drop view view_profile_edit;";
+        String oldAppVersion = getApplicationVersion(oldVersion);
+        String newAppVersion = getApplicationVersion(newVersion);
 
         try {
-            db.execSQL(drop_sql_value_type_master);
-            db.execSQL(drop_sql_profile_key_master);
-            db.execSQL(drop_sql_profile_hd);
-            db.execSQL(drop_sql_profile_detail);
-            db.execSQL(drop_sql_view_profile_list);
-            db.execSQL(drop_sql_view_profile_detail);
-            db.execSQL(drop_sql_view_profile_edit);
-        } catch(Exception e){
+            execute(db, oldAppVersion, newAppVersion);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
-            Log.d("DB",e.toString());
+    public static String getApplicationVersion(int dbVersion) {
+        int version = dbVersion / SUB_VERSION_MAX;
+        return String.format("%05d",version);
+    }
+
+
+    private void execute(SQLiteDatabase db) throws IOException {
+        this.execute(db, "00000","99999");
+    }
+
+    private void execute(SQLiteDatabase db, String fromVersion, String toVersion) throws IOException {
+        AssetManager as = mContext.getResources().getAssets();
+        String baseDir = "database";
+
+        String versions[] = as.list(baseDir);
+        Arrays.sort(versions);
+        for (String version : versions) {
+            if( (version.compareTo(fromVersion) > 0 && version.compareTo(toVersion) <= 0)
+                    || version.equals(fromVersion) && version.equals(toVersion) ) {
+                String targetDirectory = baseDir + "/" + version;
+                executeEachSql(db, targetDirectory);
+            }
+        }
+    }
+
+    private void executeEachSql(SQLiteDatabase db, String targetDirectory) throws IOException {
+        AssetManager as = mContext.getResources().getAssets();
+
+        String dropDirectory = targetDirectory + "/drop";
+        String dropSqlFiles[] = as.list(dropDirectory);
+        Arrays.sort(dropSqlFiles);
+        for (String filename : dropSqlFiles) {
+            String dropSql = readAll(as.open(dropDirectory + "/" + filename));
+            Log.d("INITIALIZE_DATABASE", dropSql);
+            db.execSQL(dropSql);
         }
 
+        String createDirectory = targetDirectory + "/create";
+        String createSqlFiles[] = as.list(createDirectory);
+        Arrays.sort(createSqlFiles);
+        for (String filename : createSqlFiles) {
+            String createSql = readAll(as.open(createDirectory + "/" + filename));
+            Log.d("INITIALIZE_DATABASE", createSql);
+            db.execSQL(createSql);
+        }
 
-        initializeDatabase(db);
+        String insertDirectory = targetDirectory + "/insert";
+        String insertSqlFiles[] = as.list(insertDirectory);
+        Arrays.sort(insertSqlFiles);
+        for (String filename : insertSqlFiles) {
+            List<String> insertSqlList = readLines(as.open(insertDirectory + "/" + filename));
+            for(String insertSql : insertSqlList){
+                if (insertSql.isEmpty()) continue;
+                Log.d("INITIALIZE_DATABASE", insertSql);
+                db.execSQL(insertSql);
+            }
+        }
 
     }
+
+    private String readAll(InputStream is) throws IOException {
+        BufferedReader br = null;
+        try {
+            br = new BufferedReader(new InputStreamReader(is,assetsFileEncoding));
+
+            StringBuilder sb = new StringBuilder();
+            String str;
+            while((str = br.readLine()) != null){
+                sb.append(str);
+                sb.append("\n");
+            }
+            return sb.toString();
+        } finally {
+            if (br != null) br.close();
+        }
+    }
+
+    private List<String> readLines(InputStream is) throws IOException {
+        BufferedReader br = null;
+        try {
+            br = new BufferedReader(new InputStreamReader(is,assetsFileEncoding));
+
+            List<String> list = new ArrayList<>();
+            String str;
+            while((str = br.readLine()) != null){
+                list.add(str);
+            }
+            return list;
+        } finally {
+            if (br != null) br.close();
+        }
+    }
+
+
 }
