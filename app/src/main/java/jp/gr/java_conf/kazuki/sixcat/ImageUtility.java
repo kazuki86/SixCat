@@ -20,11 +20,13 @@ import java.io.InputStream;
 public class ImageUtility {
 
     static int maxSize = 100;
-    public static void loadImage(ContentResolver resolver, ImageView imageView, File srcFile) {
+
+
+    public static Bitmap loadImage(ContentResolver resolver, ImageView imageView, Uri srcUri) {
         InputStream inputStream = null;
         BitmapFactory.Options imageOptions = new BitmapFactory.Options();
         try {
-            inputStream = resolver.openInputStream(Uri.fromFile(srcFile));
+            inputStream = resolver.openInputStream(srcUri);
 
 // 画像サイズ情報を取得する
             imageOptions.inJustDecodeBounds = true;
@@ -48,7 +50,7 @@ public class ImageUtility {
         Bitmap bitmap = null;
         inputStream = null;
         try {
-            inputStream = resolver.openInputStream(Uri.fromFile(srcFile));
+            inputStream = resolver.openInputStream(srcUri);
 
             float imageScaleWidth = (float)imageOptions.outWidth / maxSize;
             float imageScaleHeight = (float)imageOptions.outHeight / maxSize;
@@ -85,8 +87,10 @@ public class ImageUtility {
             }
         }
 
-        if ( bitmap != null) {
+        if ( bitmap != null && imageView!= null ) {
             imageView.setImageBitmap(bitmap);
         }
+
+        return bitmap;
     }
 }

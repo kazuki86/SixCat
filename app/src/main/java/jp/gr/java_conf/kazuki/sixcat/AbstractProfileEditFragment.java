@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore.Images;
@@ -143,17 +144,23 @@ public abstract class AbstractProfileEditFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(resultCode == Activity.RESULT_OK){
             if(requestCode == REQUEST_ACTION_PICK){
-                try {
-                    InputStream iStream = getActivity().getApplicationContext().getContentResolver().openInputStream(data.getData());
-                    Bitmap bm = BitmapFactory.decodeStream(iStream);
+//                try {
+                    ContentResolver resolver = getActivity().getContentResolver();
 
-                    // 新しいフォルダにギャラリーから選ん画像を保存
-                    createFolderSaveImage(bm, getImageFileName());
-                    iStream.close();
+//                    InputStream iStream = getActivity().getApplicationContext().getContentResolver().openInputStream(data.getData());
+//                    Bitmap bm = BitmapFactory.decodeStream(iStream);
+
 
                     int image_view_id = R.id.img_profile_edit_element;//TODO 一時策//data.getExtras().getInt(ARG_ITEM_ID);
                     ImageView imgView = (ImageView) getActivity().findViewById(image_view_id);
-                    imgView.setImageBitmap(bm);
+
+                    Bitmap bm = ImageUtility.loadImage(resolver,imgView, data.getData());
+
+                    // 新しいフォルダにギャラリーから選んだ画像を保存
+                    createFolderSaveImage(bm, getImageFileName());
+//                    iStream.close();
+
+//                    imgView.setImageBitmap(bm);
                     imgView.setTag(R.string.tag_image_file_path,
                             Environment.getExternalStorageDirectory()
                                     + "/" + imageDirectoryName
@@ -161,10 +168,10 @@ public abstract class AbstractProfileEditFragment extends Fragment {
 
 //                    EditText editText = (EditText)getActivity().findViewById(R.id.txt_profile_edit_portrait);
 //                    editText.setText(imageFileName);
-
-                }catch (IOException e) {
-                    e.printStackTrace();
-                }
+//
+//                }catch (IOException e) {
+//                    e.printStackTrace();
+//                }
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
@@ -225,7 +232,7 @@ public abstract class AbstractProfileEditFragment extends Fragment {
         try {
             // これをしないと、新規フォルダは端末をシャットダウンするまで更新されない
             Log.d("debug_kazuki", "showFolder calling");
-            //showFolder(file);
+            showFolder(file);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -330,7 +337,7 @@ public abstract class AbstractProfileEditFragment extends Fragment {
             imageView.setTag(R.string.tag_image_file_path, value);
             File srcFile = new File(value);
             ContentResolver resolver = getActivity().getContentResolver();
-            ImageUtility.loadImage(resolver,imageView, srcFile);
+            ImageUtility.loadImage(resolver,imageView, Uri.fromFile(srcFile));
 
 //            try {
 //                FileInputStream fis = new FileInputStream(srcFile);

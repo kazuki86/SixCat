@@ -3,6 +3,7 @@ package jp.gr.java_conf.kazuki.sixcat;
 import android.content.ContentResolver;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -123,7 +124,7 @@ public class ProfileDetailFragment extends Fragment {
                             imageView.setTag(R.string.tag_image_file_path,value);
                             ContentResolver resolver = getActivity().getContentResolver();
                             File srcFile = new File(value);
-                            ImageUtility.loadImage(resolver, imageView, srcFile);
+                            ImageUtility.loadImage(resolver, imageView, Uri.fromFile(srcFile));
 
 //                                FileInputStream fis = new FileInputStream(srcFile);
 //                                Bitmap bm = BitmapFactory.decodeStream(fis);
