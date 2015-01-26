@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
+import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -242,11 +243,16 @@ public abstract class AbstractProfileEditFragment extends Fragment {
         // 1:数値、2:単一行テキスト、3:複数行テキスト、4:英数字、5:選択、6:日付、7:画像
         switch (profile.value_type) {
             case 1:
+                row = getNumberView(inflater, profile.value);
+                break;
             case 2:
-            case 3:
-            case 4:
-                //
                 row = getTextView(inflater, profile.value);
+                break;
+            case 3:
+                row = getMultiTextView(inflater, profile.value);
+                break;
+            case 4:
+                row = getAlphanumView(inflater, profile.value);
                 break;
             case 5:
                 //
@@ -278,9 +284,10 @@ public abstract class AbstractProfileEditFragment extends Fragment {
 
         return row;
     }
-    private View getTextView(LayoutInflater inflater, String value) {
+
+    private View _getTextView(LayoutInflater inflater, String value, int layout_id) {
         View row;
-        row = inflater.inflate(R.layout.partial_profile_edit_element_text, null);
+        row = inflater.inflate(layout_id, null);
 
         EditText editView = (EditText) row.findViewById(R.id.txt_profile_edit_element);
         if (value != null) {
@@ -289,6 +296,19 @@ public abstract class AbstractProfileEditFragment extends Fragment {
         editView.setSaveEnabled(false);
 
         return row;
+    }
+
+    private View getTextView(LayoutInflater inflater, String value) {
+        return _getTextView(inflater, value, R.layout.partial_profile_edit_element_text);
+    }
+    private View getMultiTextView(LayoutInflater inflater, String value) {
+        return _getTextView(inflater, value, R.layout.partial_profile_edit_element_multitext);
+    }
+    private View getNumberView(LayoutInflater inflater, String value) {
+        return _getTextView(inflater, value, R.layout.partial_profile_edit_element_number);
+    }
+    private View getAlphanumView(LayoutInflater inflater, String value) {
+        return _getTextView(inflater, value, R.layout.partial_profile_edit_element_alphanum);
     }
 
     private View getImageView(LayoutInflater inflater, String value) {

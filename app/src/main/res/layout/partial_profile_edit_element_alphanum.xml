@@ -15,5 +15,5 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:id="@+id/txt_profile_edit_element"
-        android:inputType="text" />
+        android:inputType="textEmailAddress|textUri|text" />
 </LinearLayout>
