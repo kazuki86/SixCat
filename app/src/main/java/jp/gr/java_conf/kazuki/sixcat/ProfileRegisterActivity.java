@@ -195,8 +195,17 @@ public class ProfileRegisterActivity extends ActionBarActivity {
                     String label_str = cursor.getString(cursor.getColumnIndex("name"));
                     int sequence = 1;
                     String value = ""; //default value ?
+                    List<String> options = new ArrayList<>();
+                    for(int i=getResources().getInteger(R.integer.option_index_from); i<=getResources().getInteger(R.integer.option_index_to); i++) {
+                        String column_name = String.format("option%02d",i);
+                        String option = cursor.getString(cursor.getColumnIndex(column_name));
+                        if (option != null) {
+//                            options.set(i,option);
+                            options.add(option);
+                        }
+                    }
 
-                    ProfileParcelable profile = new ProfileParcelable(key_id, sequence, value, value_type, label_str);
+                    ProfileParcelable profile = new ProfileParcelable(key_id, sequence, value, value_type, label_str,options);
                     View row = createRowView(inflater, profile);
                     containerView.addView(row);
                 }

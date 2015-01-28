@@ -3,6 +3,7 @@ package jp.gr.java_conf.kazuki.sixcat;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
@@ -15,9 +16,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 
 import java.io.File;
@@ -26,6 +30,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 import jp.gr.java_conf.kazuki.sixcat.data.SixCatSQLiteOpenHelper;
 
@@ -255,10 +260,10 @@ public abstract class AbstractProfileEditFragment extends Fragment {
                 row = getAlphanumView(inflater, profile.value);
                 break;
             case 5:
-                //
+                row = getSelectView(inflater, profile.value, profile.options);
+                content_view_id = R.id.spn_profile_edit_element;
                 break;
             case 6:
-                //
                 row = getDateView(inflater, profile.value);
                 break;
             case 7:
@@ -281,6 +286,23 @@ public abstract class AbstractProfileEditFragment extends Fragment {
         contentView.setTag(R.string.tag_key_id, profile.key_id);
         contentView.setTag(R.string.tag_key_sequence, profile.sequence);
         contentView.setTag(R.string.tag_key_type, profile.value_type);
+
+        return row;
+    }
+
+    private View getSelectView(LayoutInflater inflater, String value, List<String> options) {
+        View row;
+        row = inflater.inflate( R.layout.partial_profile_edit_element_select, null);
+
+
+        Spinner spinnerEdit = (Spinner) row.findViewById(R.id.spn_profile_edit_element);
+        ArrayAdapter<String> adapter = new MyArrayAdapter(this.getActivity(), android.R.layout.simple_list_item_1, options);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerEdit.setAdapter(adapter);
+        if( value != null && !value.isEmpty()) {
+            spinnerEdit.setSelection(Integer.valueOf(value));
+        }
+        spinnerEdit.setSaveEnabled(false);
 
         return row;
     }
@@ -405,8 +427,9 @@ public abstract class AbstractProfileEditFragment extends Fragment {
             String label_str = label.getText().toString();
 
             String value = getValue(row, value_type);
+            List<String> options = getOptions(row, value_type);
 
-            ProfileParcelable content = new ProfileParcelable(key_id, sequence, value, value_type, label_str);
+            ProfileParcelable content = new ProfileParcelable(key_id, sequence, value, value_type, label_str, options);
             contents.add(content);
 
             Log.d("save", content.toString());
@@ -441,6 +464,7 @@ public abstract class AbstractProfileEditFragment extends Fragment {
             Log.d("memory leak check", "a");
         }
     }
+
     private String getValue(View container, int value_type) {
         String value = null;
         switch (value_type) {
@@ -454,6 +478,8 @@ public abstract class AbstractProfileEditFragment extends Fragment {
                 break;
             case 5:
                 //
+                Spinner spinnerEdit = (Spinner) container.findViewById(R.id.spn_profile_edit_element);
+                value = "" + spinnerEdit.getSelectedItemPosition();
                 break;
             case 6:
                 //
@@ -469,4 +495,39 @@ public abstract class AbstractProfileEditFragment extends Fragment {
         return value;
     }
 
+
+    private List<String> getOptions(View container, int value_type) {
+        List<String> options = new ArrayList<>();
+        for(int i=0; i<=9; i++) {
+            options.add(null);
+        }
+        if(value_type == 5) {
+            Spinner spinnerEdit = (Spinner) container.findViewById(R.id.spn_profile_edit_element);
+            ArrayAdapter<String> adapter = (ArrayAdapter<String>)spinnerEdit.getAdapter();
+            for(int i=0; i<adapter.getCount(); i++) {
+                String item = (String)adapter.getItem(i);
+                options.set(i, item);
+            }
+        }
+        return options;
+    }
+}
+
+class MyArrayAdapter extends ArrayAdapter<String> {
+    private int resource;
+    public  MyArrayAdapter(Context context, int resource, List<String> objects) {
+        super(context, resource, objects);
+        this.resource = resource;
+    }
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        TextView v = null;
+        if (convertView != null && convertView instanceof TextView) {
+            v = (TextView) convertView;
+        } else {
+            v = (TextView) TextView.inflate(getContext(), this.resource, null);
+        }
+        v.setText(this.getItem(position));
+        return v;
+    }
 }

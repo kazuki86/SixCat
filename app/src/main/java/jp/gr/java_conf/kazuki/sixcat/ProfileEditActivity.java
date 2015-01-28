@@ -281,8 +281,17 @@ public class ProfileEditActivity extends ActionBarActivity {
                         int value_type = cursor.getInt(cursor.getColumnIndex("value_type_id"));
                         int sequence = (sequence_str == null) ? 1 : Integer.valueOf(sequence_str);
                         String label_str = cursor.getString(cursor.getColumnIndex("name")) + ((sequence > 1 ? sequence : ""));
+                        List<String> options = new ArrayList<>();
+                        for(int i=getResources().getInteger(R.integer.option_index_from); i<=getResources().getInteger(R.integer.option_index_to); i++) {
+                            String column_name = String.format("option%02d",i);
+                            String option = cursor.getString(cursor.getColumnIndex(column_name));
+                            if (option != null) {
+//                                options.set(i,option);
+                                options.add(option);
+                            }
+                        }
 
-                        ProfileParcelable profile = new ProfileParcelable(key_id, sequence, value, value_type, label_str);
+                        ProfileParcelable profile = new ProfileParcelable(key_id, sequence, value, value_type, label_str,options);
                         View row = createRowView(inflater, profile);
                         containerView.addView(row);
                     }

@@ -3,6 +3,8 @@ package jp.gr.java_conf.kazuki.sixcat;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.List;
+
 /**
  * ProfileParcelable
  * プロフィール項目を保持し、save & restoreに使える形式
@@ -15,6 +17,7 @@ public class ProfileParcelable implements Parcelable {
     public String value;
     public int value_type;
     public String label_str;
+    public List<String> options;
 
     @Override
     public int describeContents() {
@@ -28,6 +31,7 @@ public class ProfileParcelable implements Parcelable {
         dest.writeString(value);
         dest.writeInt(value_type);
         dest.writeString(label_str);
+        dest.writeStringList(options);
     }
 
     public static final Parcelable.Creator<ProfileParcelable> CREATOR
@@ -46,6 +50,7 @@ public class ProfileParcelable implements Parcelable {
         value = in.readString();
         value_type =in.readInt();
         label_str = in.readString();
+        in.readStringList(options);
     }
 
     public ProfileParcelable(
@@ -53,17 +58,19 @@ public class ProfileParcelable implements Parcelable {
             int sequence,
             String value,
             int value_type,
-            String label_str
+            String label_str,
+            List<String> options
     ){
         this.key_id = key_id;
         this.sequence = sequence;
         this.value = value;
         this.value_type = value_type;
         this. label_str = label_str;
+        this.options = options;
     }
 
     @Override
     public String toString() {
-        return "ProfileParcelable[" + key_id +  "," + sequence +  "," + value +  "," + value_type +  "," + label_str +  "]";
+        return "ProfileParcelable[" + key_id +  "," + sequence +  "," + value +  "," + value_type +  "," + label_str + "," + options + "]";
     }
 }

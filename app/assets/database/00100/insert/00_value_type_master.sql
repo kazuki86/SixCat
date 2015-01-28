@@ -1,7 +1,7 @@
-insert into value_type_master values( 1, '”’l'); 
-insert into value_type_master values( 2, '’PˆêsƒeƒLƒXƒg'); 
-insert into value_type_master values( 3, '•¡”sƒeƒLƒXƒg'); 
-insert into value_type_master values( 4, '‰p”š'); 
-insert into value_type_master values( 5, '‘I‘ğ'); 
-insert into value_type_master values( 6, '“ú•t'); 
-insert into value_type_master values( 7, '‰æ‘œ'); 
+insert into value_type_master values( 1, 'æ•°å€¤'); 
+insert into value_type_master values( 2, 'å˜ä¸€è¡Œãƒ†ã‚­ã‚¹ãƒˆ'); 
+insert into value_type_master values( 3, 'è¤‡æ•°è¡Œãƒ†ã‚­ã‚¹ãƒˆ'); 
+insert into value_type_master values( 4, 'è‹±æ•°å­—'); 
+insert into value_type_master values( 5, 'é¸æŠ'); 
+insert into value_type_master values( 6, 'æ—¥ä»˜'); 
+insert into value_type_master values( 7, 'ç”»åƒ'); 
