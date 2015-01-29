@@ -88,12 +88,12 @@ public class ProfileDetailActivity extends ActionBarActivity {
                 startActivity(intent);
 
                 break;
-            case R.id.menu_profile_detail_appointment_list:
-                //showDialog("menu_profile_list_appointment_list");
-                return true;
-            case R.id.menu_profile_detail_appointment_register:
-                //showDialog("menu_profile_list_appointment_register");
-                return true;
+//            case R.id.menu_profile_detail_appointment_list:
+//                //showDialog("menu_profile_list_appointment_list");
+//                return true;
+//            case R.id.menu_profile_detail_appointment_register:
+//                //showDialog("menu_profile_list_appointment_register");
+//                return true;
         }
         return super.onOptionsItemSelected(item);
     }

@@ -137,12 +137,12 @@ public class ProfileListActivity extends ActionBarActivity
                 intent.putExtra(AbstractProfileEditFragment.ARG_ITEM_ID, profile_id);
                 startActivity(intent);
                 break;
-            case R.id.menu_profile_list_appointment_list:
-                showDialog("menu_profile_list_appointment_list");
-                break;
-            case R.id.menu_profile_list_appointment_register:
-                showDialog("menu_profile_list_appointment_register");
-                break;
+//            case R.id.menu_profile_list_appointment_list:
+//                showDialog("menu_profile_list_appointment_list");
+//                break;
+//            case R.id.menu_profile_list_appointment_register:
+//                showDialog("menu_profile_list_appointment_register");
+//                break;
         }
         return super.onOptionsItemSelected(item);
     }

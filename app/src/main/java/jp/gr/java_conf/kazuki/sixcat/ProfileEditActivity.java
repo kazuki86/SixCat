@@ -115,7 +115,7 @@ public class ProfileEditActivity extends ActionBarActivity {
 
             final ProfileEditActivity activity = (ProfileEditActivity)getActivity();
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setTitle("Confirmation");
+            builder.setTitle(getString(R.string.delete_confirm_dialog_title));
             builder.setMessage("本当に削除しますか？");
             builder.setPositiveButton("はい", new DialogInterface.OnClickListener() {
                 @Override

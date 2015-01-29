@@ -7,10 +7,4 @@
     <item android:id="@+id/menu_profile_detail_profile_edit"
         android:title="@string/menu_button_edit_profile"
         app:showAsAction="always" />
-    <item android:id="@+id/menu_profile_list_appointment_list"
-        android:title="@string/menu_button_appointment_list"
-        app:showAsAction="ifRoom" />
-    <item android:id="@+id/menu_profile_list_appointment_register"
-        android:title="@string/menu_button_register_appointment"
-        app:showAsAction="ifRoom" />
 </menu>
