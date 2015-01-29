@@ -15,6 +15,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import jp.gr.java_conf.kazuki.sixcat.data.SixCatSQLiteOpenHelper;
 
@@ -95,6 +97,17 @@ public class ProfileDetailFragment extends Fragment {
                 String label_str = cursor.getString(cursor.getColumnIndex("name")) + ((sequence>1?sequence:""));
                 int value_type =  cursor.getInt(cursor.getColumnIndex("value_type_id"));
 
+                List<KeyValueItem> options = new ArrayList<>();
+                options.add(new KeyValueItem(R.integer.option_no_select_id, getString(R.string.option_default_string)));
+                for(int i=getResources().getInteger(R.integer.option_index_from); i<=getResources().getInteger(R.integer.option_index_to); i++) {
+                    String column_name = String.format("option%02d",i);
+                    String option = cursor.getString(cursor.getColumnIndex(column_name));
+                    if (option != null) {
+//                                options.set(i,option);
+                        options.add(new KeyValueItem(i,option));
+                    }
+                }
+
                 if (value == null) {
                     continue;
                 }
@@ -115,6 +128,17 @@ public class ProfileDetailFragment extends Fragment {
                         textView.setText(value);
                         break;
                     case 5:
+                        row = inflater.inflate(R.layout.partial_profile_detail_element_text, null);
+                        TextView textView2 = (TextView) row.findViewById(R.id.txt_profile_detail_element);
+
+                        //AbstractProfileEditFragment # getSelectView と重複してるなー
+                        String option_str = "";
+                        for(int i=0; i<options.size(); i++) {
+                            if (value.equals(""+options.get(i).key)) {
+                                option_str = options.get(i).value;
+                            }
+                        }
+                        textView2.setText(option_str);
                         break;
                     case 7:
                         row = inflater.inflate(R.layout.partial_profile_detail_element_image, null);

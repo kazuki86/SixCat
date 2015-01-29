@@ -4,7 +4,7 @@ insert into profile_key_master values ( 3,'ニックネーム'   ,'',4,0,2,'',0,
 insert into profile_key_master values ( 4,'誕生日'         ,'',5,0,6,'1980/01/01',0,1,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null);
 insert into profile_key_master values ( 5,'写真'           ,'',1,0,7,'',0,1,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null);
 insert into profile_key_master values ( 6,'出身地'         ,'',6,0,2,'',0,1,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null);
-insert into profile_key_master values ( 7,'血液型'         ,'',7,0,5,'',0,1,"A","B","O","AB",null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null);
+insert into profile_key_master values ( 7,'血液型'         ,'',7,0,5,'',0,1,"A型","B型","O型","AB型",null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null);
 insert into profile_key_master values ( 8,'仕事'           ,'',8,0,2,'',0,1,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null);
 insert into profile_key_master values ( 9,'靴のサイズ'     ,'',9,0,1,'',0,1,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null);
 insert into profile_key_master values (10,'好きな食べ物'  ,'',10,0,2,'',0,1,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null);

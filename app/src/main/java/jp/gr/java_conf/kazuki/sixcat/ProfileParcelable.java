@@ -17,7 +17,7 @@ public class ProfileParcelable implements Parcelable {
     public String value;
     public int value_type;
     public String label_str;
-    public List<String> options;
+    public List<KeyValueItem> options;
 
     @Override
     public int describeContents() {
@@ -31,7 +31,7 @@ public class ProfileParcelable implements Parcelable {
         dest.writeString(value);
         dest.writeInt(value_type);
         dest.writeString(label_str);
-        dest.writeStringList(options);
+        dest.writeTypedList(options);
     }
 
     public static final Parcelable.Creator<ProfileParcelable> CREATOR
@@ -50,7 +50,7 @@ public class ProfileParcelable implements Parcelable {
         value = in.readString();
         value_type =in.readInt();
         label_str = in.readString();
-        in.readStringList(options);
+        in.readTypedList(options,KeyValueItem.CREATOR);
     }
 
     public ProfileParcelable(
@@ -59,7 +59,7 @@ public class ProfileParcelable implements Parcelable {
             String value,
             int value_type,
             String label_str,
-            List<String> options
+            List<KeyValueItem> options
     ){
         this.key_id = key_id;
         this.sequence = sequence;

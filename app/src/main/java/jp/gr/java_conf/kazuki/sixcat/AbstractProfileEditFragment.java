@@ -290,17 +290,26 @@ public abstract class AbstractProfileEditFragment extends Fragment {
         return row;
     }
 
-    private View getSelectView(LayoutInflater inflater, String value, List<String> options) {
+    private View getSelectView(LayoutInflater inflater, String value, List<KeyValueItem> options) {
         View row;
         row = inflater.inflate( R.layout.partial_profile_edit_element_select, null);
 
 
         Spinner spinnerEdit = (Spinner) row.findViewById(R.id.spn_profile_edit_element);
-        ArrayAdapter<String> adapter = new MyArrayAdapter(this.getActivity(), android.R.layout.simple_list_item_1, options);
+        ArrayAdapter<KeyValueItem> adapter = new ArrayAdapter<>(this.getActivity(), android.R.layout.simple_list_item_1, options);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerEdit.setAdapter(adapter);
+
+        Log.d("Spinner", "value " + value);
         if( value != null && !value.isEmpty()) {
-            spinnerEdit.setSelection(Integer.valueOf(value));
+
+            for(int i=0; i<options.size(); i++) {
+                if (value.equals(""+options.get(i).key)) {
+                    spinnerEdit.setSelection(i);
+                    Log.d("Spinner", "Selected " + i);
+                }
+            }
+//            spinnerEdit.setSelection(Integer.valueOf(value));
         }
         spinnerEdit.setSaveEnabled(false);
 
@@ -427,7 +436,7 @@ public abstract class AbstractProfileEditFragment extends Fragment {
             String label_str = label.getText().toString();
 
             String value = getValue(row, value_type);
-            List<String> options = getOptions(row, value_type);
+            List<KeyValueItem> options = getOptions(row, value_type);
 
             ProfileParcelable content = new ProfileParcelable(key_id, sequence, value, value_type, label_str, options);
             contents.add(content);
@@ -465,7 +474,7 @@ public abstract class AbstractProfileEditFragment extends Fragment {
         }
     }
 
-    private String getValue(View container, int value_type) {
+    protected String getValue(View container, int value_type) {
         String value = null;
         switch (value_type) {
             case 1:
@@ -479,7 +488,12 @@ public abstract class AbstractProfileEditFragment extends Fragment {
             case 5:
                 //
                 Spinner spinnerEdit = (Spinner) container.findViewById(R.id.spn_profile_edit_element);
-                value = "" + spinnerEdit.getSelectedItemPosition();
+                KeyValueItem item = (KeyValueItem)spinnerEdit.getSelectedItem();
+                if (item.key == R.integer.option_no_select_id) {
+                    value = "";
+                } else {
+                    value = "" + item.key;
+                }
                 break;
             case 6:
                 //
@@ -496,38 +510,38 @@ public abstract class AbstractProfileEditFragment extends Fragment {
     }
 
 
-    private List<String> getOptions(View container, int value_type) {
-        List<String> options = new ArrayList<>();
+    private List<KeyValueItem> getOptions(View container, int value_type) {
+        List<KeyValueItem> options = new ArrayList<>();
         for(int i=0; i<=9; i++) {
             options.add(null);
         }
         if(value_type == 5) {
             Spinner spinnerEdit = (Spinner) container.findViewById(R.id.spn_profile_edit_element);
-            ArrayAdapter<String> adapter = (ArrayAdapter<String>)spinnerEdit.getAdapter();
+            ArrayAdapter<KeyValueItem> adapter = (ArrayAdapter<KeyValueItem>)spinnerEdit.getAdapter();
             for(int i=0; i<adapter.getCount(); i++) {
-                String item = (String)adapter.getItem(i);
+                KeyValueItem item = (KeyValueItem)adapter.getItem(i);
                 options.set(i, item);
             }
         }
         return options;
     }
 }
-
-class MyArrayAdapter extends ArrayAdapter<String> {
-    private int resource;
-    public  MyArrayAdapter(Context context, int resource, List<String> objects) {
-        super(context, resource, objects);
-        this.resource = resource;
-    }
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        TextView v = null;
-        if (convertView != null && convertView instanceof TextView) {
-            v = (TextView) convertView;
-        } else {
-            v = (TextView) TextView.inflate(getContext(), this.resource, null);
-        }
-        v.setText(this.getItem(position));
-        return v;
-    }
-}
+//
+//class MyArrayAdapter extends ArrayAdapter<String> {
+//    private int resource;
+//    public  MyArrayAdapter(Context context, int resource, List<String> objects) {
+//        super(context, resource, objects);
+//        this.resource = resource;
+//    }
+//    @Override
+//    public View getView(int position, View convertView, ViewGroup parent) {
+//        TextView v = null;
+//        if (convertView != null && convertView instanceof TextView) {
+//            v = (TextView) convertView;
+//        } else {
+//            v = (TextView) TextView.inflate(getContext(), this.resource, null);
+//        }
+//        v.setText(this.getItem(position));
+//        return v;
+//    }
+//}

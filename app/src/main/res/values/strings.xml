@@ -22,4 +22,6 @@
     <string name="tag_key_sequence">101</string>
     <string name="tag_key_type">102</string>
     <string name="tag_image_file_path">103</string>
+
+    <string name="option_default_string">選択してください</string>
 </resources>

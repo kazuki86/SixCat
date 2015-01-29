@@ -21,7 +21,7 @@ import java.util.List;
  */
 public class SixCatSQLiteOpenHelper  extends SQLiteOpenHelper {
 
-    static final int VERSION        = 100000008;
+    static final int VERSION        = 100000009;
     static final int SUB_VERSION_MAX = 1000000;
 
     static String assetsFileEncoding = "UTF-8";

@@ -2,4 +2,5 @@
 <resources>
     <integer name="option_index_from">0</integer>
     <integer name="option_index_to">19</integer>
+    <integer name='option_no_select_id'>-1</integer>
 </resources>

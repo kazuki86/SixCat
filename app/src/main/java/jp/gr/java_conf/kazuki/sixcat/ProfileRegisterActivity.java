@@ -16,6 +16,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -133,7 +134,13 @@ public class ProfileRegisterActivity extends ActionBarActivity {
                 value = editText.getText().toString();
                 break;
             case 5:
-                value = null;
+                Spinner spinnerEdit = (Spinner) child.findViewById(R.id.spn_profile_edit_element);
+                KeyValueItem item = (KeyValueItem)spinnerEdit.getSelectedItem();
+                if (item.key == R.integer.option_no_select_id) {
+                    value = "";
+                } else {
+                    value = "" + item.key;
+                }
                 break;
             case 7:
                 ImageView imageView = (ImageView) child.findViewById(R.id.img_profile_edit_element);
@@ -195,13 +202,13 @@ public class ProfileRegisterActivity extends ActionBarActivity {
                     String label_str = cursor.getString(cursor.getColumnIndex("name"));
                     int sequence = 1;
                     String value = ""; //default value ?
-                    List<String> options = new ArrayList<>();
+                    List<KeyValueItem> options = new ArrayList<>();
+                    options.add(new KeyValueItem(R.integer.option_no_select_id, getString(R.string.option_default_string)));
                     for(int i=getResources().getInteger(R.integer.option_index_from); i<=getResources().getInteger(R.integer.option_index_to); i++) {
                         String column_name = String.format("option%02d",i);
                         String option = cursor.getString(cursor.getColumnIndex(column_name));
                         if (option != null) {
-//                            options.set(i,option);
-                            options.add(option);
+                            options.add(new KeyValueItem(i,option));
                         }
                     }
 
