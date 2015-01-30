@@ -55,27 +55,14 @@ public class ProfileDetailFragment extends Fragment {
 
         if (getArguments().containsKey(ARG_ITEM_ID)) {
 
-            Log.d("View", "ARG_ITEM_ID:" + getArguments().getString(ARG_ITEM_ID));
-//            long id = Long.getLong(getArguments().getString(ARG_ITEM_ID));
             SixCatSQLiteOpenHelper helper = new SixCatSQLiteOpenHelper(getActivity());
 
             SQLiteDatabase db = helper.getReadableDatabase();
-            //sample
-//            cursor = db.query("view_profile_list",
-//                    new String[]{"_id","status","name","kana","nickname","birthday"},
-//                    "_id = ?",new String[]{getArguments().getString(ARG_ITEM_ID)}
-//                    ,null,null,null);
             cursor = db.query("view_profile_detail",
                     null,
                     "profile_id = ?",new String[]{getArguments().getString(ARG_ITEM_ID)}
                     ,null,null,"sort_order");
-            //cursor.moveToFirst();
 
-            Log.d("Debug", "ccc");
-            // Load the dummy content specified by the fragment
-            // arguments. In a real-world scenario, use a Loader
-            // to load content from a content provider.
-//            mItem = DummyContent.ITEM_MAP.get(getArguments().getString(ARG_ITEM_ID));
         }
     }
 
@@ -90,7 +77,6 @@ public class ProfileDetailFragment extends Fragment {
 
             while(cursor.moveToNext()){
 
-//                String key_id = cursor.getString(cursor.getColumnIndex("_id"));
                 String value =  cursor.getString(cursor.getColumnIndex("value"));
                 String sequence_str =  cursor.getString(cursor.getColumnIndex("sequence"));
                 int sequence = (sequence_str == null) ? 1 : Integer.valueOf(sequence_str);
@@ -103,7 +89,6 @@ public class ProfileDetailFragment extends Fragment {
                     String column_name = String.format("option%02d",i);
                     String option = cursor.getString(cursor.getColumnIndex(column_name));
                     if (option != null) {
-//                                options.set(i,option);
                         options.add(new KeyValueItem(i,option));
                     }
                 }
@@ -114,7 +99,6 @@ public class ProfileDetailFragment extends Fragment {
 
 
                 View row = null;
-//                int content_view_id = R.id.txt_profile_edit_element;
                 // 1:数値、2:単一行テキスト、3:複数行テキスト、4:英数字、5:選択、6:日付、7:画像
                 switch(value_type) {
                     case 1:
@@ -149,10 +133,6 @@ public class ProfileDetailFragment extends Fragment {
                             ContentResolver resolver = getActivity().getContentResolver();
                             File srcFile = new File(value);
                             ImageUtility.loadImage(resolver, imageView, Uri.fromFile(srcFile));
-
-//                                FileInputStream fis = new FileInputStream(srcFile);
-//                                Bitmap bm = BitmapFactory.decodeStream(fis);
-//                                imageView.setImageBitmap(bm);
                         }
                         break;
                 }

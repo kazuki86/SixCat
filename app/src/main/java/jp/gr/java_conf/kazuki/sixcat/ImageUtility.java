@@ -31,7 +31,6 @@ public class ImageUtility {
 // 画像サイズ情報を取得する
             imageOptions.inJustDecodeBounds = true;
             BitmapFactory.decodeStream(inputStream, null, imageOptions);
-            Log.v("image", "Original Image Size: " + imageOptions.outWidth + " x " + imageOptions.outHeight);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -55,8 +54,6 @@ public class ImageUtility {
             float imageScaleWidth = (float)imageOptions.outWidth / maxSize;
             float imageScaleHeight = (float)imageOptions.outHeight / maxSize;
 
-            Log.d("image size", "" + imageOptions.outWidth + " / "+ maxSize + " = " + imageScaleWidth);
-
             // もしも、縮小できるサイズならば、縮小して読み込む
             if (imageScaleWidth > 2 && imageScaleHeight > 2) {
                 BitmapFactory.Options imageOptions2 = new BitmapFactory.Options();
@@ -70,7 +67,6 @@ public class ImageUtility {
                 }
 
                 bitmap = BitmapFactory.decodeStream(inputStream, null, imageOptions2);
-                Log.v("image", "Sample Size: 1/" + imageOptions2.inSampleSize);
             } else {
                 bitmap = BitmapFactory.decodeStream(inputStream);
             }

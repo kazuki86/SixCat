@@ -60,12 +60,8 @@ public class ProfileRegisterActivity extends ActionBarActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_profile_register_save) {
 
-//            PlaceholderFragment fragment = (PlaceholderFragment)getSupportFragmentManager().findFragmentById(R.id.container);
-//            EditText edit_name= (EditText)fragment.getView().findViewById(R.id.et_profile_edit_name);
-//            showDialog("save result", "name:" + edit_name.getText().toString());
             long profile_id = save();
             if ( profile_id != -1 ) {
                 Intent detailIntent = new Intent(this, ProfileDetailActivity.class);
@@ -73,7 +69,6 @@ public class ProfileRegisterActivity extends ActionBarActivity {
                 startActivity(detailIntent);
             } else {
                 Toast.makeText(this, R.string.message_fail_to_save, Toast.LENGTH_LONG).show();
-                //showDialog("Error", "保存に失敗しました。");
             }
             return true;
         }else if (id == R.id.action_profile_register_cancel) {

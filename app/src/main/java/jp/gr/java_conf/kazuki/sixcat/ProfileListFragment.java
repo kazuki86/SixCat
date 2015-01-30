@@ -86,7 +86,6 @@ public class ProfileListFragment extends ListFragment {
                 new int[] { R.id.txt_profile_list_element_main, R.id.txt_profile_list_element_sub1, R.id.txt_profile_list_element_sub2 }
                 );
         setListAdapter(adapter);
-        Log.d("Activity", "ProfileListFragment#onCreate called.");
     }
 
     @Override
@@ -123,12 +122,6 @@ public class ProfileListFragment extends ListFragment {
     @Override
     public void onListItemClick(ListView listView, View view, int position, long id) {
         super.onListItemClick(listView, view, position, id);
-
-        Log.d("View","id:"+id);
-
-        // Notify the active callbacks interface (the activity, if the
-        // fragment is attached to one) that an item has been selected.
-        //mCallbacks.onItemSelected(DummyContent.ITEMS.get(position).id);
         mCallbacks.onItemSelected(Long.toString(id));
     }
 
@@ -136,7 +129,6 @@ public class ProfileListFragment extends ListFragment {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         if (mActivatedPosition != ListView.INVALID_POSITION) {
-            // Serialize and persist the activated item position.
             outState.putInt(STATE_ACTIVATED_POSITION, mActivatedPosition);
         }
     }

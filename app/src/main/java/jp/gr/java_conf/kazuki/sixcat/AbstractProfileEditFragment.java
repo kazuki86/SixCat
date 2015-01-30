@@ -186,15 +186,12 @@ public abstract class AbstractProfileEditFragment extends Fragment {
      */
     private void createFolderSaveImage(Bitmap imageToSave, String fileName) {
 
-        Log.d("debug_kazuki", "createFolderSaveImage called");
         // 新しいフォルダへのパス
         String folderPath = Environment.getExternalStorageDirectory()
                 + "/" + imageDirectoryName;
 
-        Log.d("debug_kazuki", folderPath);
         File folder = new File(folderPath);
         if (!folder.exists()) {
-            Log.d("debug_kazuki", "mkdirs calling");
             if (!folder.mkdirs()) {
                 throw new RuntimeException("cannot make a directory [" + folderPath + "]");
             }
@@ -220,7 +217,6 @@ public abstract class AbstractProfileEditFragment extends Fragment {
         try {
             FileOutputStream out = new FileOutputStream(file);
 
-            Log.d("debug_kazuki", "save calling");
             imageToSave.compress(Bitmap.CompressFormat.JPEG, 100, out);
             out.flush();
             out.close();
@@ -242,7 +238,6 @@ public abstract class AbstractProfileEditFragment extends Fragment {
 
     protected View createRowView(LayoutInflater inflater, ProfileParcelable profile) {
 
-//            Log.d("construct data", "       " + key_id + "," + value);
         View row = null;
         int content_view_id = R.id.txt_profile_edit_element;
         // 1:数値、2:単一行テキスト、3:複数行テキスト、4:英数字、5:選択、6:日付、7:画像
@@ -300,13 +295,11 @@ public abstract class AbstractProfileEditFragment extends Fragment {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerEdit.setAdapter(adapter);
 
-        Log.d("Spinner", "value " + value);
         if( value != null && !value.isEmpty()) {
 
             for(int i=0; i<options.size(); i++) {
                 if (value.equals(""+options.get(i).key)) {
                     spinnerEdit.setSelection(i);
-                    Log.d("Spinner", "Selected " + i);
                 }
             }
 //            spinnerEdit.setSelection(Integer.valueOf(value));
@@ -354,14 +347,6 @@ public abstract class AbstractProfileEditFragment extends Fragment {
             ContentResolver resolver = getActivity().getContentResolver();
             ImageUtility.loadImage(resolver,imageView, Uri.fromFile(srcFile));
 
-//            try {
-//                FileInputStream fis = new FileInputStream(srcFile);
-//                Bitmap bm = BitmapFactory.decodeStream(fis);
-//                imageView.setImageBitmap(bm);
-//            } catch (FileNotFoundException e) {
-//                Log.d("IMAGE ERROR", e.toString());
-//                e.printStackTrace();
-//            }
         }
         return row;
     }
@@ -414,8 +399,6 @@ public abstract class AbstractProfileEditFragment extends Fragment {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        Log.d("DEBUG", "onSaveInstanceState called.");
-
         LinearLayout containerView = (LinearLayout) getActivity().findViewById(R.id.container_profile_edit);
 
         ArrayList<ProfileParcelable> contents = new ArrayList<>();
@@ -440,8 +423,6 @@ public abstract class AbstractProfileEditFragment extends Fragment {
 
             ProfileParcelable content = new ProfileParcelable(key_id, sequence, value, value_type, label_str, options);
             contents.add(content);
-
-            Log.d("save", content.toString());
 
             releaseResource(row, value_type);
         }
@@ -470,7 +451,6 @@ public abstract class AbstractProfileEditFragment extends Fragment {
             //Image
             ImageView imageView = (ImageView) container.findViewById(R.id.img_profile_edit_element);
             imageView.setImageDrawable(null);
-            Log.d("memory leak check", "a");
         }
     }
 
