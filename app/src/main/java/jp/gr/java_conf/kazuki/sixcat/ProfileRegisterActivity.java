@@ -17,11 +17,13 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import jp.gr.java_conf.kazuki.sixcat.data.SixCatSQLiteOpenHelper;
+import jp.gr.java_conf.kazuki.sixcat.dialog.FailToSaveDialog;
 
 
 public class ProfileRegisterActivity extends ActionBarActivity {
@@ -70,7 +72,8 @@ public class ProfileRegisterActivity extends ActionBarActivity {
                 detailIntent.putExtra(ProfileDetailFragment.ARG_ITEM_ID, Long.toString(profile_id));
                 startActivity(detailIntent);
             } else {
-                showDialog("Error", "保存に失敗しました。");
+                Toast.makeText(this, R.string.message_fail_to_save, Toast.LENGTH_LONG).show();
+                //showDialog("Error", "保存に失敗しました。");
             }
             return true;
         }else if (id == R.id.action_profile_register_cancel) {
@@ -104,6 +107,16 @@ public class ProfileRegisterActivity extends ActionBarActivity {
                 values.add(new ProfileDetail(Long.valueOf(key_id), sequence, value));
             }
 
+            ProfileValidator validator = ProfileValidator.getInstance();
+            int errorMsgId = validator.validate(values);
+            if (errorMsgId != ProfileValidator.NO_ERROR) {
+                String errorMsg = getString(errorMsgId);
+                FailToSaveDialog dialog = new FailToSaveDialog();
+                dialog.setMessage(errorMsg);
+                dialog.show(getSupportFragmentManager(), "Error");
+                return -1;
+            }
+
             for(ProfileDetail value : values) {
                 ContentValues profileDetail = new ContentValues();
                 profileDetail.put("profile_id", id);
@@ -114,10 +127,11 @@ public class ProfileRegisterActivity extends ActionBarActivity {
             }
 
             db.setTransactionSuccessful();
-            db.endTransaction();
 
         } catch(RuntimeException e) {
             return -1;
+        } finally {
+            db.endTransaction();
         }
         return id;
     }
@@ -232,14 +246,14 @@ public class ProfileRegisterActivity extends ActionBarActivity {
 
     }
 
-    class ProfileDetail{
-        public long key_id;
-        public int sequence;
-        public String value;
-        public ProfileDetail(long key_id, int sequence, String value){
-            this.key_id = key_id;
-            this.sequence = sequence;
-            this.value = value;
-        }
-    }
+//    class ProfileDetail{
+//        public long key_id;
+//        public int sequence;
+//        public String value;
+//        public ProfileDetail(long key_id, int sequence, String value){
+//            this.key_id = key_id;
+//            this.sequence = sequence;
+//            this.value = value;
+//        }
+//    }
 }

@@ -22,11 +22,13 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import jp.gr.java_conf.kazuki.sixcat.data.SixCatSQLiteOpenHelper;
+import jp.gr.java_conf.kazuki.sixcat.dialog.FailToSaveDialog;
 
 
 public class ProfileEditActivity extends ActionBarActivity {
@@ -89,7 +91,8 @@ public class ProfileEditActivity extends ActionBarActivity {
                 detailIntent.putExtra(ProfileDetailFragment.ARG_ITEM_ID, profile_id);
                 startActivity(detailIntent);
             } else {
-                showDialog("Error", "保存に失敗しました。");
+                Toast.makeText(this, R.string.message_fail_to_save, Toast.LENGTH_LONG).show();
+                //showDialog("Error", "保存に失敗しました。");
             }
             return true;
         } else if (id == R.id.action_profile_edit_delete) {
@@ -182,6 +185,17 @@ public class ProfileEditActivity extends ActionBarActivity {
                 values.add(new ProfileDetail(Long.valueOf(key_id), sequence, value));
             }
 
+            ProfileValidator validator = ProfileValidator.getInstance();
+            int errorMsgId = validator.validate(values);
+            if (errorMsgId != ProfileValidator.NO_ERROR) {
+                String errorMsg = getString(errorMsgId);
+                FailToSaveDialog dialog = new FailToSaveDialog();
+                dialog.setMessage(errorMsg);
+                dialog.show(getSupportFragmentManager(), "Error");
+                return false;
+            }
+
+
             db.delete("profile_detail", "profile_id = ?", new String[]{profile_id});
             for (ProfileDetail value : values) {
                 ContentValues profileDetail = new ContentValues();
@@ -193,11 +207,12 @@ public class ProfileEditActivity extends ActionBarActivity {
             }
 
             db.setTransactionSuccessful();
-            db.endTransaction();
 
         } catch (Exception e) {
             Log.e("ERROR", e.toString());
             return false;
+        } finally {
+            db.endTransaction();
         }
         return true;
     }
@@ -330,17 +345,17 @@ public class ProfileEditActivity extends ActionBarActivity {
         }
     }
 
-    static class ProfileDetail {
-        public long key_id;
-        public int sequence;
-        public String value;
-
-        public ProfileDetail(long key_id, int sequence, String value) {
-            this.key_id = key_id;
-            this.sequence = sequence;
-            this.value = value;
-        }
-    }
+//    static class ProfileDetail {
+//        public long key_id;
+//        public int sequence;
+//        public String value;
+//
+//        public ProfileDetail(long key_id, int sequence, String value) {
+//            this.key_id = key_id;
+//            this.sequence = sequence;
+//            this.value = value;
+//        }
+//    }
 
 
 }

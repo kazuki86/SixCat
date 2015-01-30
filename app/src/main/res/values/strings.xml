@@ -23,4 +23,6 @@
     <string name="delete_confirm_dialog_title">確認</string>
 
 
+    <string name="message_fail_to_save">保存に失敗しました</string>
+    <string name="validate_message_all_empty">全ての項目が空です</string>
 </resources>
